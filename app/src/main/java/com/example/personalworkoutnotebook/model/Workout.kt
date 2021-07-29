@@ -15,15 +15,16 @@ data class Workout (
 @Entity(tableName = "workouts")
 @TypeConverters(DateConverter::class)
 data class RoomWorkout(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "workout_id") val id: Long,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long,
     @ColumnInfo(name = "date") val date: Calendar,
     @ColumnInfo(name = "name") val name:String
 )
 
-data class RoomWorkoutWithExercises(
-    @Embedded val workout: RoomWorkout,
-    @Relation(parentColumn = "workout_Id", entityColumn = "workout_id")
-    val exercises : List<RoomExercise>
+
+data class RoomWorkoutWithExercisesAndApproaches(
+    @Embedded val roomWorkout: RoomWorkout,
+    @Relation(parentColumn = "id", entityColumn = "workout_id", entity = RoomExercise::class)
+    val exercises : List<RoomExerciseWithApproach>
 )
 
 @Suppress("unused")
@@ -38,9 +39,9 @@ fun Workout.toRoom() = RoomWorkout(
     name = this.name
 )
 
-fun RoomWorkoutWithExercises.toModel(): Workout = Workout(
-    id = this.workout.id,
-    date = this.workout.date,
-    name = this.workout.name,
-    exercises = listOf() //this.exercises.map{it.toModel()}
+fun RoomWorkoutWithExercisesAndApproaches.toModel(): Workout = Workout(
+    id = this.roomWorkout.id,
+    date = this.roomWorkout.date,
+    name = this.roomWorkout.name,
+    exercises = this.exercises.map { it.toModel() }
 )

@@ -20,9 +20,13 @@ interface ApproachDao {
     suspend fun getApproaches(): List<RoomApproach>?
 
     @Transaction
-    @Query("SELECT * FROM approaches WHERE approach_id = :id")
+    @Query("SELECT * FROM approaches WHERE id = :id")
     suspend fun getOneById(id: Long): RoomApproach?
 
-    @Query("SELECT EXISTS(SELECT * FROM approaches WHERE approach_id LIKE :id)")
+    @Transaction
+    @Query("SELECT * FROM approaches WHERE exercise_id = :exerciseId")
+    suspend fun getAllByExerciseId(exerciseId: Long): List<RoomApproach>
+
+    @Query("SELECT EXISTS(SELECT * FROM approaches WHERE id LIKE :id)")
     suspend fun isExist(id: Long): Boolean
 }

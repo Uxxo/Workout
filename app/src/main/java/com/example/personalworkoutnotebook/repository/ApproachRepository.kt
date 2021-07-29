@@ -19,6 +19,10 @@ class ApproachRepository @Inject constructor(
         }
     }
 
+    suspend fun getAllByExerciseId(exerciseId: Long):List<RoomApproach>{
+        return approachDao.getAllByExerciseId(exerciseId)
+    }
+
     suspend fun save(approach: Approach, exerciseId : Long) : Approach{
         return withContext(Dispatchers.IO){
             if(approachDao.isExist(approach.id)){

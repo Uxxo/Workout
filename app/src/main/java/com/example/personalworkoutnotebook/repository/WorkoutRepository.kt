@@ -45,7 +45,7 @@ class WorkoutRepository @Inject constructor(
 
     suspend fun delete(id: Long): Boolean{
         return withContext(Dispatchers.IO){
-            val workout = workoutDao.getOneById(id)?.workout
+            val workout = workoutDao.getOneById(id)?.roomWorkout
             if (workout !=null){
                 workoutDao.delete(workout)
             }

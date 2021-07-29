@@ -11,7 +11,7 @@ data class Exercise(
 
 @Entity(tableName = "exercises")
 data class RoomExercise(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "exercise_id") val id: Long,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "notes") val notes: String?,
     @ColumnInfo(name = "workout_id") val workoutId: Long
@@ -19,7 +19,7 @@ data class RoomExercise(
 
 data class RoomExerciseWithApproach(
     @Embedded val exercise: RoomExercise,
-    @Relation(parentColumn = "exercise_id", entityColumn = "exercise_id")
+    @Relation(parentColumn = "id", entityColumn = "exercise_id", entity = RoomApproach::class)
     val approaches: List<RoomApproach>
 )
 
@@ -34,5 +34,5 @@ fun RoomExerciseWithApproach.toModel(): Exercise = Exercise(
     id = this.exercise.id,
     name = this.exercise.name,
     notes = this.exercise.notes,
-    approaches = this.approaches.map { it.toModel() }
+    approaches =  this.approaches.map { it.toModel() }
 )

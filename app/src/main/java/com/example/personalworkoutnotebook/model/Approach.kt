@@ -13,7 +13,7 @@ data class Approach(
 
 @Entity(tableName = "approaches")
 data class RoomApproach(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "approach_id") val id: Long,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long,
     @ColumnInfo(name = "mass") val mass: Double,
     @ColumnInfo(name = "repeat") val repeat: Int,
     @ColumnInfo(name = "exercise_id") val exerciseId: Long

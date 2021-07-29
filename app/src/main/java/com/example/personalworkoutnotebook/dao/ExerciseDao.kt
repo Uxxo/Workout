@@ -21,10 +21,10 @@ interface ExerciseDao {
     suspend fun getExercisesWithApproaches(): List<RoomExerciseWithApproach>?
 
     @Transaction
-    @Query("SELECT * FROM exercises WHERE exercise_id = :id")
+    @Query("SELECT * FROM exercises WHERE id = :id")
     suspend fun getOneById(id: Long):RoomExerciseWithApproach?
 
-    @Query("SELECT EXISTS(SELECT * FROM exercises WHERE exercise_id LIKE :id)")
+    @Query("SELECT EXISTS(SELECT * FROM exercises WHERE id LIKE :id)")
     suspend fun isExist(id: Long): Boolean
 
 }
