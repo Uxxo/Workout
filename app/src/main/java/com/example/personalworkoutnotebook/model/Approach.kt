@@ -7,6 +7,7 @@ import java.io.Serializable
 
 data class Approach(
     var id:Long = 0L,
+    val exerciseId: Long,
     val mass:Double,
     val repeat:Int,
 ) : Serializable
@@ -19,16 +20,16 @@ data class RoomApproach(
     @ColumnInfo(name = "exercise_id") val exerciseId: Long
 )
 
-fun Approach.toRoom(exerciseId: Long) = RoomApproach(
+fun Approach.toRoom() = RoomApproach(
     id = this.id,
     mass = this.mass,
     repeat = this.repeat,
-    exerciseId = exerciseId
+    exerciseId = this.exerciseId
 )
 
 fun RoomApproach.toModel() = Approach(
     id = this.id,
     mass = this.mass,
     repeat = this.repeat,
-
+    exerciseId = this.exerciseId
 )

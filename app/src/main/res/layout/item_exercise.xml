@@ -1,326 +1,306 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_margin="8dp">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:elevation="3dp">
 
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/exerciseTitleLayout"
-        style="@style/Input"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/exercise_title_hint"
-        app:helperText="@string/exercise_title_helper"
-        app:layout_constraintTop_toTopOf="parent"
-        >
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/exerciseTitleEditText"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_margin="8dp">
 
-    </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachMass1"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_mass"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/approachMass2"
-        app:layout_constraintTop_toBottomOf="@id/exerciseTitleLayout"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/exerciseName"
+            style="@style/Input"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_height="wrap_content"
+            android:hint="@string/exercise_title_hint"
+            app:helperText="@string/exercise_title_helper"
+            app:layout_constraintTop_toTopOf="parent">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachRepeats1"
-        style="@style/Input"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/exerciseNameEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@={exercise.name}" />
 
-        android:layout_height="49dp"
-        android:hint="@string/approach_repeats"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/approachMass2"
-        app:layout_constraintTop_toBottomOf="@id/approachMass1"
-        tools:ignore="MissingConstraints">
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachMass1"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_mass"
+            app:layout_constraintEnd_toStartOf="@id/approachMass2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/exerciseName"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachRepeats1"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_repeats"
+            app:layout_constraintEnd_toStartOf="@id/approachMass2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/approachMass1"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachMass2"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_mass"
+            app:layout_constraintEnd_toStartOf="@id/approachMass3"
+            app:layout_constraintStart_toEndOf="@id/approachMass1"
+            app:layout_constraintTop_toBottomOf="@id/exerciseName"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachRepeats2"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_repeats"
+            app:layout_constraintEnd_toStartOf="@id/approachMass3"
+            app:layout_constraintStart_toEndOf="@id/approachRepeats1"
+            app:layout_constraintTop_toBottomOf="@id/approachMass1"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachMass3"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_mass"
+            app:layout_constraintEnd_toStartOf="@id/approachMass4"
+            app:layout_constraintStart_toEndOf="@id/approachMass2"
+            app:layout_constraintTop_toBottomOf="@id/exerciseName"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachRepeats3"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_repeats"
+            app:layout_constraintEnd_toStartOf="@id/approachMass4"
+            app:layout_constraintStart_toEndOf="@id/approachRepeats2"
+            app:layout_constraintTop_toBottomOf="@id/approachMass1"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachMass4"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_mass"
+            app:layout_constraintEnd_toStartOf="@id/approachMass5"
+            app:layout_constraintStart_toEndOf="@id/approachMass3"
+            app:layout_constraintTop_toBottomOf="@id/exerciseName"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachRepeats4"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_repeats"
+            app:layout_constraintEnd_toStartOf="@id/approachMass5"
+            app:layout_constraintStart_toEndOf="@id/approachRepeats3"
+            app:layout_constraintTop_toBottomOf="@id/approachMass1"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachMass5"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_mass"
+            app:layout_constraintEnd_toStartOf="@id/approachMass6"
+            app:layout_constraintStart_toEndOf="@id/approachMass4"
+            app:layout_constraintTop_toBottomOf="@id/exerciseName"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachRepeats5"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_repeats"
+            app:layout_constraintEnd_toStartOf="@id/approachMass6"
+            app:layout_constraintStart_toEndOf="@id/approachRepeats4"
+            app:layout_constraintTop_toBottomOf="@id/approachMass1"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachMass6"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_mass"
+            app:layout_constraintEnd_toStartOf="@id/approachMass7"
+            app:layout_constraintStart_toEndOf="@id/approachMass5"
+            app:layout_constraintTop_toBottomOf="@id/exerciseName"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachRepeats6"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_repeats"
+            app:layout_constraintEnd_toStartOf="@id/approachMass7"
+            app:layout_constraintStart_toEndOf="@id/approachRepeats5"
+            app:layout_constraintTop_toBottomOf="@id/approachMass1"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachMass7"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_mass"
+            app:layout_constraintEnd_toStartOf="@id/approachMass8"
+            app:layout_constraintStart_toEndOf="@id/approachMass6"
+            app:layout_constraintTop_toBottomOf="@id/exerciseName"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachRepeats7"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_repeats"
+            app:layout_constraintEnd_toStartOf="@id/approachMass8"
+            app:layout_constraintStart_toEndOf="@id/approachRepeats6"
+            app:layout_constraintTop_toBottomOf="@id/approachMass1"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachMass8"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_mass"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/approachMass7"
+            app:layout_constraintTop_toBottomOf="@id/exerciseName"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/approachRepeats8"
+            style="@style/Input"
+
+            android:layout_height="49dp"
+            android:hint="@string/approach_repeats"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/approachRepeats7"
+            app:layout_constraintTop_toBottomOf="@id/approachMass1"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/exerciseNote"
+            style="@style/Input"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_height="wrap_content"
+            android:hint="@string/exercise_note_hint"
+            app:helperText="@string/exercise_note_helper"
+            app:layout_constraintTop_toBottomOf="@id/approachRepeats1">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachMass2"
-        style="@style/Input"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/exerciseNoteEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-        android:layout_height="49dp"
-        android:hint="@string/approach_mass"
-        app:layout_constraintStart_toEndOf="@id/approachMass1"
-        app:layout_constraintEnd_toStartOf="@id/approachMass3"
-        app:layout_constraintTop_toBottomOf="@id/exerciseTitleLayout"
-        tools:ignore="MissingConstraints">
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachRepeats2"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_repeats"
-        app:layout_constraintStart_toEndOf="@id/approachRepeats1"
-        app:layout_constraintEnd_toStartOf="@id/approachMass3"
-        app:layout_constraintTop_toBottomOf="@id/approachMass1"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachMass3"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_mass"
-        app:layout_constraintStart_toEndOf="@id/approachMass2"
-        app:layout_constraintEnd_toStartOf="@id/approachMass4"
-        app:layout_constraintTop_toBottomOf="@id/exerciseTitleLayout"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachRepeats3"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_repeats"
-        app:layout_constraintStart_toEndOf="@id/approachRepeats2"
-        app:layout_constraintEnd_toStartOf="@id/approachMass4"
-        app:layout_constraintTop_toBottomOf="@id/approachMass1"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachMass4"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_mass"
-        app:layout_constraintStart_toEndOf="@id/approachMass3"
-        app:layout_constraintEnd_toStartOf="@id/approachMass5"
-        app:layout_constraintTop_toBottomOf="@id/exerciseTitleLayout"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachRepeats4"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_repeats"
-        app:layout_constraintStart_toEndOf="@id/approachRepeats3"
-        app:layout_constraintEnd_toStartOf="@id/approachMass5"
-        app:layout_constraintTop_toBottomOf="@id/approachMass1"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachMass5"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_mass"
-        app:layout_constraintStart_toEndOf="@id/approachMass4"
-        app:layout_constraintEnd_toStartOf="@id/approachMass6"
-        app:layout_constraintTop_toBottomOf="@id/exerciseTitleLayout"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachRepeats5"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_repeats"
-        app:layout_constraintStart_toEndOf="@id/approachRepeats4"
-        app:layout_constraintEnd_toStartOf="@id/approachMass6"
-        app:layout_constraintTop_toBottomOf="@id/approachMass1"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachMass6"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_mass"
-        app:layout_constraintStart_toEndOf="@id/approachMass5"
-        app:layout_constraintEnd_toStartOf="@id/approachMass7"
-        app:layout_constraintTop_toBottomOf="@id/exerciseTitleLayout"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachRepeats6"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_repeats"
-        app:layout_constraintStart_toEndOf="@id/approachRepeats5"
-        app:layout_constraintEnd_toStartOf="@id/approachMass7"
-        app:layout_constraintTop_toBottomOf="@id/approachMass1"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachMass7"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_mass"
-        app:layout_constraintStart_toEndOf="@id/approachMass6"
-        app:layout_constraintEnd_toStartOf="@id/approachMass8"
-        app:layout_constraintTop_toBottomOf="@id/exerciseTitleLayout"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachRepeats7"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_repeats"
-        app:layout_constraintStart_toEndOf="@id/approachRepeats6"
-        app:layout_constraintEnd_toStartOf="@id/approachMass8"
-        app:layout_constraintTop_toBottomOf="@id/approachMass1"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachMass8"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_mass"
-        app:layout_constraintStart_toEndOf="@id/approachMass7"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/exerciseTitleLayout"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/approachRepeats8"
-        style="@style/Input"
-
-        android:layout_height="49dp"
-        android:hint="@string/approach_repeats"
-        app:layout_constraintStart_toEndOf="@id/approachRepeats7"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/approachMass1"
-        tools:ignore="MissingConstraints">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/exerciseNoteLayout"
-        style="@style/Input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/exercise_note_hint"
-        app:helperText="@string/exercise_note_helper"
-        app:layout_constraintTop_toBottomOf="@id/approachRepeats1"
-        >
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/exerciseNoteEditText"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

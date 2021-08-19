@@ -20,15 +20,16 @@ class ExerciseRepository @Inject constructor(
         }
     }
 
-    suspend fun save(exercise: Exercise, workoutId: Long): Exercise{
+
+    suspend fun save(exercise: Exercise): Exercise{
         return withContext(Dispatchers.IO){
             if(exerciseDao.isExist(exercise.id)){
-                exerciseDao.update(exercise.toRoom(workoutId))
-                exercise.approaches.forEach{approach -> approachRepository.save(approach, exercise.id)}
+                exerciseDao.update(exercise.toRoom())
+                exercise.approaches.forEach{approach -> approachRepository.save(approach)}
                 exerciseDao.getOneById(exercise.id)!!.toModel()
             } else {
-                val id = exerciseDao.insert(exercise.toRoom(workoutId))
-                exercise.approaches.forEach { approach -> approachRepository.save(approach, id) }
+                val id = exerciseDao.insert(exercise.toRoom())
+                exercise.approaches.forEach { approach -> approachRepository.save(approach) }
                 exerciseDao.getOneById(id)!!.toModel()
             }
         }

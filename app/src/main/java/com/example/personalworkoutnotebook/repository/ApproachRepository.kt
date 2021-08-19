@@ -23,13 +23,13 @@ class ApproachRepository @Inject constructor(
         return approachDao.getAllByExerciseId(exerciseId)
     }
 
-    suspend fun save(approach: Approach, exerciseId : Long) : Approach{
+    suspend fun save(approach: Approach) : Approach{
         return withContext(Dispatchers.IO){
             if(approachDao.isExist(approach.id)){
-                approachDao.update(approach.toRoom(exerciseId))
+                approachDao.update(approach.toRoom())
                 approachDao.getOneById(approach.id)!!.toModel()
             } else{
-                val  id = approachDao.insert(approach.toRoom(exerciseId))
+                val  id = approachDao.insert(approach.toRoom())
                 approachDao.getOneById(id)!!.toModel()
             }
         }

@@ -20,4 +20,9 @@ class ExerciseViewModel @Inject constructor(
     private var _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean>
         get() = _isLoading
+
+    suspend fun saveExercise(exercise: Exercise){
+        exerciseRepository.save(exercise)
+    }
+
 }

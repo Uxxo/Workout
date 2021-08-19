@@ -4,9 +4,10 @@ import androidx.room.*
 
 data class Exercise(
     val id: Long = 0L,
+    val workoutId: Long,
     val name: String,
     val notes: String?,
-    val approaches: List<Approach> = listOf()
+    val approaches: MutableList<Approach> = mutableListOf()
 )
 
 @Entity(tableName = "exercises")
@@ -23,16 +24,17 @@ data class RoomExerciseWithApproach(
     val approaches: List<RoomApproach>
 )
 
-fun Exercise.toRoom(workoutId: Long) = RoomExercise(
+fun Exercise.toRoom() = RoomExercise(
     id = this.id,
     name = this.name,
     notes = this.notes,
-    workoutId = workoutId
+    workoutId =this.workoutId
 )
 
 fun RoomExerciseWithApproach.toModel(): Exercise = Exercise(
     id = this.exercise.id,
+    workoutId =this.exercise.workoutId,
     name = this.exercise.name,
     notes = this.exercise.notes,
-    approaches =  this.approaches.map { it.toModel() }
+    approaches =  this.approaches.map { it.toModel() }.toMutableList()
 )

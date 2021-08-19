@@ -33,11 +33,11 @@ class WorkoutRepository @Inject constructor(
         return withContext(Dispatchers.IO) {
             if (workoutDao.isExist(workout.id)) {
                 workoutDao.update(workout.toRoom())
-                workout.exercises.forEach { exercise -> exerciseRepository.save(exercise, workout.id) }
+                workout.exercises.forEach { exercise -> exerciseRepository.save(exercise) }
                 workoutDao.getOneById(workout.id)!!.toModel()
             } else {
                 val id = workoutDao.insert(workout.toRoom())
-                workout.exercises.forEach { exercise -> exerciseRepository.save(exercise,id) }
+                workout.exercises.forEach { exercise -> exerciseRepository.save(exercise) }
                 workoutDao.getOneById(id)!!.toModel()
             }
         }

@@ -31,4 +31,9 @@ class ApproachViewModel @Inject constructor(
     fun updateApproach(approach: Approach){
         _approach.value = approach
     }
+
+    suspend fun saveApproach(approach: Approach){
+        approachRepository.save(approach)
+    }
+
 }
