@@ -1,21 +1,20 @@
 package com.example.personalworkoutnotebook.ui.adapter
 
+import android.app.AlertDialog
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.personalworkoutnotebook.databinding.ItemExerciseBinding
 import com.example.personalworkoutnotebook.extension.afterTextChanged
-import com.example.personalworkoutnotebook.model.Approach
 import com.example.personalworkoutnotebook.model.Exercise
-import com.google.android.material.textfield.TextInputLayout
+import com.example.personalworkoutnotebook.ui.ViewEvent
 
 class ExerciseAdapter(
-    private val exercises: MutableList<Exercise>,
-    val exerciseCallback: (exercise: Exercise) -> Unit,
-    val approachCallback: (approach: Approach) -> Unit
+    private val exerciseList: MutableList<Exercise>,
+    private val callback: (event: ViewEvent) -> Unit
 ) :
     RecyclerView.Adapter<ExerciseAdapter.ExerciseHolder>() {
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ExerciseHolder(
@@ -27,78 +26,75 @@ class ExerciseAdapter(
         )
 
 
-    override fun onBindViewHolder(holder: ExerciseHolder, position: Int) {
-        holder.bind(exercises[position])
-    }
+    override fun onBindViewHolder(holder: ExerciseHolder, position: Int) =
+        holder.bind(exerciseList[position])
+
 
 
     override fun getItemCount(): Int {
-        return exercises.size
+        return exerciseList.size
     }
 
     inner class ExerciseHolder(private val exerciseBinding: ItemExerciseBinding) :
         RecyclerView.ViewHolder(exerciseBinding.root) {
 
+        private lateinit var approachRecycle: RecyclerView
+
+
         fun bind(exercise: Exercise) {
-            exerciseBinding.exerciseName.editText?.setText(exercise.name)
-            exerciseBinding.exerciseName.editText?.afterTextChanged {
-                val index = exercises.indexOf(exercise)
-                val editedExercise = exercise.copy(name = it)
-                exercises.removeAt(index)
-                exercises.add(index, editedExercise)
-                exerciseCallback.invoke(editedExercise)
-            }
-            exerciseBinding.exerciseNote.editText?.setText(exercise.notes)
-            exerciseBinding.exerciseNote.editText?.afterTextChanged {
-                val index = exercises.indexOf(exercise)
-                val editedExercise = exercise.copy(notes = it)
-                exercises.removeAt(index)
-                exercises.add(index, editedExercise)
-                exerciseCallback.invoke(editedExercise)
-            }
-            val layouts = listOf(
-                Pair(exerciseBinding.approachRepeats1, exerciseBinding.approachMass1),
-                Pair(exerciseBinding.approachRepeats2, exerciseBinding.approachMass2),
-                Pair(exerciseBinding.approachRepeats3, exerciseBinding.approachMass3),
-                Pair(exerciseBinding.approachRepeats4, exerciseBinding.approachMass4),
-                Pair(exerciseBinding.approachRepeats5, exerciseBinding.approachMass5),
-                Pair(exerciseBinding.approachRepeats6, exerciseBinding.approachMass6),
-                Pair(exerciseBinding.approachRepeats7, exerciseBinding.approachMass7),
-                Pair(exerciseBinding.approachRepeats8, exerciseBinding.approachMass8)
-            )
-            exercise.approaches.forEachIndexed { index, approach ->
-                saveChangesInApproach(layouts[index], approach, exercise)
-            }
 
-        }
+                exerciseBinding.deleteExercise.setOnClickListener {
+                    with(itemView.context) {
+                        AlertDialog.Builder(this)
+                            .setTitle("Are you shore?")
+                            .setMessage("This exercise will be permanently deleted")
+                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                callback.invoke(ViewEvent.DeleteExercise(exercise))
 
-        private fun saveChangesInApproach(
-            layouts: Pair<TextInputLayout, TextInputLayout>,
-            approach: Approach,
-            exercise: Exercise
-        ) {
-            var editedApproach: Approach?
-            layouts.first.editText?.setText(approach.repeat)
-            layouts.first.editText?.afterTextChanged {
-                editedApproach = approach.copy(repeat = it.toInt())
-                saveData(editedApproach, exercise, approach)
-            }
+                                notifyItemRemoved(adapterPosition)
+                            }
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show()
+                    }
+                }
 
-            layouts.second.editText?.setText(approach.mass.toString())
-            layouts.second.editText?.afterTextChanged {
-                editedApproach = approach.copy(mass = it.toDouble())
-                saveData(editedApproach, exercise, approach)
-            }
 
-        }
+                exerciseBinding.exerciseName.editText?.setText(exercise.name)
+                exerciseBinding.exerciseName.editText?.afterTextChanged { text ->
+                    val editedExercise = exercise.copy(name = text)
+                    val index = exerciseList.indexOf(exerciseList.first{it.id == exercise.id })
+                    exerciseList.removeAt(index)
+                    exerciseList.add(index,editedExercise)
+                    callback.invoke(ViewEvent.SaveExercise(editedExercise))
+                }
+                exerciseBinding.exerciseName.setOnFocusChangeListener { _, hasFocus ->
+                    if(!hasFocus) callback.invoke(ViewEvent.UpdateWorkoutData(exercise))
+                }
 
-        private fun saveData(
-            editedApproach: Approach?, exercise: Exercise, approach: Approach) {
-            val approachIndex = exercise.approaches.indexOf(approach)
-            exercise.approaches.removeAt(approachIndex)
-            exercise.approaches.add(approachIndex, approach)
-            approachCallback.invoke(editedApproach!!)
+                exerciseBinding.approachRecycler.adapter = ApproachAdapter(mutableListOf(), callback)
+
+                val approachAdapter = ApproachAdapter(exercise.approaches as MutableList, callback)
+                approachRecycle = exerciseBinding.approachRecycler
+                approachRecycle.adapter = approachAdapter
+
+                exerciseBinding.exerciseNote.editText?.setText(exercise.notes)
+                exerciseBinding.exerciseNote.editText?.afterTextChanged { text ->
+                    val editedExercise = exercise.copy(notes = text)
+                    val index = exerciseList.indexOf(exerciseList.first { it.id == exercise.id })
+                    exerciseList.removeAt(index)
+                    exerciseList.add(index,editedExercise)
+                    callback.invoke(ViewEvent.SaveExercise(editedExercise))
+                }
+
+                exerciseBinding.exerciseNote.editText?.onFocusChangeListener = View.OnFocusChangeListener{_, hasFocus ->
+                    if(!hasFocus){callback.invoke(ViewEvent.UpdateWorkoutData(exercise.workoutId))}
+                }
+
+                exerciseBinding.addApproach.setOnClickListener {
+                    callback.invoke(ViewEvent.AddApproachToExercise(exercise))
+
+                    approachAdapter.notifyDataSetChanged()
+                }
         }
     }
-
 }

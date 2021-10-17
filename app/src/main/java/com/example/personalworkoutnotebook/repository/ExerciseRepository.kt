@@ -10,8 +10,8 @@ import javax.inject.Inject
 
 class ExerciseRepository @Inject constructor(
 
-    val exerciseDao: ExerciseDao,
-    val approachRepository: ApproachRepository
+    private val exerciseDao: ExerciseDao,
+    private val approachRepository: ApproachRepository
 ) {
 
     suspend fun getById(id : Long): Exercise?{
@@ -20,13 +20,24 @@ class ExerciseRepository @Inject constructor(
         }
     }
 
+    suspend fun getByWorkoutId(id: Long) : List<Exercise>{
+        return withContext(Dispatchers.IO){
+            val exerciseList : MutableList<Exercise> = mutableListOf()
+            exerciseDao.getExercisesByWorkoutId(id)?.forEach { roomExerciseWithApproach ->
+                exerciseList.add(roomExerciseWithApproach.toModel())
+            }
+            return@withContext exerciseList
+        }
+    }
 
     suspend fun save(exercise: Exercise): Exercise{
         return withContext(Dispatchers.IO){
             if(exerciseDao.isExist(exercise.id)){
                 exerciseDao.update(exercise.toRoom())
                 exercise.approaches.forEach{approach -> approachRepository.save(approach)}
+
                 exerciseDao.getOneById(exercise.id)!!.toModel()
+
             } else {
                 val id = exerciseDao.insert(exercise.toRoom())
                 exercise.approaches.forEach { approach -> approachRepository.save(approach) }
@@ -35,13 +46,14 @@ class ExerciseRepository @Inject constructor(
         }
     }
 
-    suspend fun delete(id: Long): Boolean{
+    suspend fun delete(exercise: Exercise): Boolean{
         return withContext(Dispatchers.IO){
-            val exercise = exerciseDao.getOneById(id)?.exercise
-            if (exercise !=null){
-                exerciseDao.delete(exercise)
-            }
-            !exerciseDao.isExist(id)
+            approachRepository.delete(exercise.approaches)
+            val exerciseForDelete = exerciseDao.getOneById(exercise.id)?.exercise
+            if (exerciseForDelete !=null) exerciseDao.delete(exerciseForDelete)
+
+
+            !exerciseDao.isExist(exercise.id)
         }
     }
 }

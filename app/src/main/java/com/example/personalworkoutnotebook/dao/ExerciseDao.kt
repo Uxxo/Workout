@@ -27,4 +27,6 @@ interface ExerciseDao {
     @Query("SELECT EXISTS(SELECT * FROM exercises WHERE id LIKE :id)")
     suspend fun isExist(id: Long): Boolean
 
+    @Query("SELECT * FROM exercises WHERE workout_id = :id")
+    suspend fun getExercisesByWorkoutId(id : Long) : List<RoomExerciseWithApproach>
 }

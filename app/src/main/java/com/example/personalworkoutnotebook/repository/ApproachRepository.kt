@@ -1,5 +1,6 @@
 package com.example.personalworkoutnotebook.repository
 
+import com.example.personalworkoutnotebook.App
 import com.example.personalworkoutnotebook.dao.ApproachDao
 import com.example.personalworkoutnotebook.model.Approach
 import com.example.personalworkoutnotebook.model.RoomApproach
@@ -19,8 +20,14 @@ class ApproachRepository @Inject constructor(
         }
     }
 
-    suspend fun getAllByExerciseId(exerciseId: Long):List<RoomApproach>{
-        return approachDao.getAllByExerciseId(exerciseId)
+    suspend fun getAllByExerciseId(exerciseId: Long):List<Approach>{
+        return withContext(Dispatchers.IO) {
+            val approachesList : MutableList<Approach> = mutableListOf()
+            approachDao.getAllByExerciseId(exerciseId).forEach { roomApproach ->
+                approachesList.add(roomApproach.toModel())
+            }
+            return@withContext approachesList
+        }
     }
 
     suspend fun save(approach: Approach) : Approach{
@@ -44,4 +51,12 @@ class ApproachRepository @Inject constructor(
             !approachDao.isExist(id)
         }
     }
+
+    suspend fun delete(approaches : List<Approach>){
+        approaches.forEach {
+            if(approachDao.isExist(it.id)){
+            approachDao.delete(it.toRoom())}
+        }
+    }
+
 }

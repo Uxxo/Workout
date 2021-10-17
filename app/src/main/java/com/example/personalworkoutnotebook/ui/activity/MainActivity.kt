@@ -1,20 +1,17 @@
-package com.example.personalworkoutnotebook
+package com.example.personalworkoutnotebook.ui.activity
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.example.personalworkoutnotebook.databinding.ActivityMainBinding
 import com.example.personalworkoutnotebook.model.Workout
-import com.example.personalworkoutnotebook.repository.WorkoutRepository
-import com.example.personalworkoutnotebook.ui.activity.WorkoutActivity
+import com.example.personalworkoutnotebook.ui.ViewEvent
 import com.example.personalworkoutnotebook.ui.adapter.WorkoutAdapter
 import com.example.personalworkoutnotebook.ui.viewModel.WorkoutViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -31,9 +28,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // находим ресайклер и помещаем в него адаптер с пустым списком
-        binding.workoutRecycler.adapter = WorkoutAdapter(listOf())
+        binding.workoutRecycler.adapter = WorkoutAdapter(mutableListOf()){event ->
+            when(event){
+                is ViewEvent.DeleteWorkout -> lifecycleScope.launch { workoutViewModel.deleteWorkout(event.workout) }
+            }
+        }
 
-        workoutViewModel.loadingIndicator.observe(this) { isVisible ->
+        workoutViewModel.isLoading.observe(this) { isVisible ->
             binding.progressLayout.visibility = if (isVisible) View.VISIBLE else View.GONE
         }
 
@@ -42,20 +43,28 @@ class MainActivity : AppCompatActivity() {
         workoutViewModel.workouts.observe(this) { workouts ->
             //помещаем список workouts в новый объект типа WorkoutAdapter и помещаем этот объект
             //в переменную адаптер которая уже назначена ресайклеру
-            val adapter = WorkoutAdapter(workouts)
+
+            val adapter = WorkoutAdapter(
+              if(workouts.isNotEmpty())  {workouts as MutableList<Workout>}
+              else mutableListOf()
+            ){ event ->
+                when(event){
+                    is ViewEvent.DeleteWorkout -> lifecycleScope.launch { workoutViewModel.deleteWorkout(event.workout) }
+                }
+            }
             binding.workoutRecycler.adapter  = adapter
             //Сообщаем адаптеру, что данные в нем изменились и нужно перерисоваться
             adapter.notifyDataSetChanged()
         }
 
         binding.startNewWorkout.setOnClickListener {
-            startActivity(Intent(this, WorkoutActivity::class.java))
+            startActivity(Intent(this, CreateNewWorkoutActivity::class.java))
         }
 
     }
 
     override fun onStart() {
-
+//
 //        GlobalScope.launch {
 //            workoutViewModel.createTestDB()
 //        }

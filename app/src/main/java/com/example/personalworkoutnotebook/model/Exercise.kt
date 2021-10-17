@@ -7,7 +7,7 @@ data class Exercise(
     val workoutId: Long,
     val name: String,
     val notes: String?,
-    val approaches: MutableList<Approach> = mutableListOf()
+    val approaches: List<Approach> = listOf()
 )
 
 @Entity(tableName = "exercises")
@@ -28,13 +28,13 @@ fun Exercise.toRoom() = RoomExercise(
     id = this.id,
     name = this.name,
     notes = this.notes,
-    workoutId =this.workoutId
+    workoutId = this.workoutId
 )
 
 fun RoomExerciseWithApproach.toModel(): Exercise = Exercise(
     id = this.exercise.id,
-    workoutId =this.exercise.workoutId,
+    workoutId = this.exercise.workoutId,
     name = this.exercise.name,
     notes = this.exercise.notes,
-    approaches =  this.approaches.map { it.toModel() }.toMutableList()
+    approaches = this.approaches.map { it.toModel() }.toMutableList()
 )

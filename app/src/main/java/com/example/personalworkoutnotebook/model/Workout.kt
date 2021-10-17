@@ -9,7 +9,7 @@ data class Workout (
     val id:Long = 0,
     val date: Calendar,
     val name: String,
-    val exercises: List<Exercise> = listOf()
+    val exercises: List<Exercise> = mutableListOf()
 ) : Serializable
 
 @Entity(tableName = "workouts")
@@ -43,5 +43,5 @@ fun RoomWorkoutWithExercisesAndApproaches.toModel(): Workout = Workout(
     id = this.roomWorkout.id,
     date = this.roomWorkout.date,
     name = this.roomWorkout.name,
-    exercises = this.exercises.map { it.toModel() }
+    exercises = this.exercises.map { it.toModel() } as MutableList<Exercise>
 )

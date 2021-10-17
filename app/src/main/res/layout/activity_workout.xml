@@ -4,28 +4,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="8dp">
+    android:layout_margin="8dp"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
 
 
     <TextView
         android:id="@+id/workoutDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
         app:layout_constraintBottom_toTopOf="@id/exerciseRecycler"
         app:layout_constraintEnd_toStartOf="@id/workoutTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="workout date" />
 
-    <TextView
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/workoutTitle"
-        android:layout_width="wrap_content"
+        style="@style/Input"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/exerciseRecycler"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/workoutDate"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="workout name" />
+        tools:text="workout name">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/workoutTitleEditText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:singleLine="true"
+            />
+
+
+
+
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/exerciseRecycler"
@@ -34,9 +51,11 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@id/startNewExercise"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/workoutTitle"
-        tools:listitem="@layout/item_exercise" />
+        tools:listitem="@layout/item_exercise"
+        app:reverseLayout="true"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/startNewExercise"
@@ -47,5 +66,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/exerciseRecycler" />
+
+
+    <FrameLayout
+        android:id="@+id/workoutProgressLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:visibility="gone"
+        >
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            />
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
