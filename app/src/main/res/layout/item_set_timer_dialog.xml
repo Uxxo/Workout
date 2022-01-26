@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_set_timer_dialog"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="8dp"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    android:elevation="5dp"
+    android:layout_gravity="center">
+
+   <androidx.constraintlayout.widget.ConstraintLayout
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_gravity="center"
+       >
+
+       <TextView
+           android:id="@+id/set_timers_time"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           app:layout_constraintTop_toTopOf="parent"
+           app:layout_constraintBottom_toTopOf="@id/time"
+           app:layout_constraintStart_toStartOf="parent"
+           app:layout_constraintEnd_toEndOf="parent"
+           android:text="@string/set_time"
+           />
+
+       <com.google.android.material.textfield.TextInputLayout
+           android:id="@+id/time"
+           style="@style/Input"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           app:layout_constraintTop_toBottomOf ="@id/set_timers_time"
+           app:layout_constraintStart_toStartOf="parent"
+           app:layout_constraintEnd_toEndOf="parent"
+           >
+
+       <com.google.android.material.textfield.TextInputEditText
+           android:id="@+id/time_field"
+           style="@style/Input"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:singleLine="true"
+           android:digits="0123456789:"
+           android:text="@string/timer_clear"
+           android:inputType="time"
+           />
+
+
+       </com.google.android.material.textfield.TextInputLayout>
+
+       <com.google.android.material.button.MaterialButton
+           android:id="@+id/positive_button"
+           style="?attr/materialButtonOutlinedStyle"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_margin="5dp"
+           app:layout_constraintTop_toBottomOf="@id/time"
+           app:layout_constraintBottom_toBottomOf="parent"
+           app:layout_constraintStart_toEndOf="@id/negative_button"
+           app:layout_constraintEnd_toEndOf="parent"
+           android:text="@string/ok"
+           />
+
+       <com.google.android.material.button.MaterialButton
+           android:id="@+id/negative_button"
+           style="?attr/materialButtonOutlinedStyle"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_margin="5dp"
+           app:layout_constraintTop_toBottomOf="@id/time"
+           app:layout_constraintBottom_toBottomOf="parent"
+           app:layout_constraintStart_toStartOf="parent"
+           app:layout_constraintEnd_toStartOf="@id/positive_button"
+            android:text="@string/cancel"
+           />
+
+   </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+</androidx.cardview.widget.CardView>

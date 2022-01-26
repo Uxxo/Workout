@@ -1,32 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:elevation="3dp">
+    android:padding="8dp"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    android:elevation="8dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp">
 
-        <ImageButton
-            android:id="@+id/deleteExercise"
-            android:src="@drawable/ic_delete"
-            style="@style/Widget.MaterialComponents.FloatingActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            app:tint="#CC0000"
-           app:layout_constraintStart_toEndOf="@id/exerciseName"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/exerciseName"
-            android:elevation="2dp"
-            />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/exerciseName"
@@ -35,24 +24,49 @@
             android:layout_height="wrap_content"
             android:hint="@string/exercise_title_hint"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/deleteExercise"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintEnd_toStartOf="@id/exerciseGroup"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/approachRecycler"
+            android:nextFocusForward="@id/approachRecycler"
+            >
 
-            <com.google.android.material.textfield.TextInputEditText
+            <AutoCompleteTextView
                 android:id="@+id/exerciseNameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:singleLine="true"
+                android:padding="7dp"
+                android:singleLine="false"
                 android:text="@={exercise.name}"
-                tools:text="Name"/>
+                tools:text="Name" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/exerciseGroup"
+            style="@style/Input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="80dp"
+            android:hint="@string/exercise_group_hint"
+            app:layout_constraintStart_toEndOf="@id/exerciseName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/exerciseName">
+
+            <AutoCompleteTextView
+                android:id="@+id/exerciseGroupEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="7dp"
+                android:singleLine="true"
+                android:text="@={exercise.group}"
+                tools:text="Group"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
 
-    <ImageButton
+        <ImageButton
         android:id="@+id/addApproach"
-        android:src="@drawable/ic_add"
+        android:src="@drawable/ic_plus"
         style="@style/Widget.MaterialComponents.FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
@@ -61,12 +75,26 @@
         app:tint="#005CCC"
         app:layout_constraintStart_toEndOf="@id/approachRecycler"
         app:layout_constraintTop_toBottomOf="@id/exerciseName"
-        app:layout_constraintBottom_toBottomOf="@id/approachRecycler"
+        app:layout_constraintBottom_toTopOf="@id/deleteApproach"
         app:layout_constraintEnd_toEndOf="parent"
-        android:elevation="2dp"
         />
 
-    <androidx.recyclerview.widget.RecyclerView
+        <ImageButton
+            android:id="@+id/deleteApproach"
+            android:src="@drawable/ic_minus"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:paddingStart="11dp"
+            android:paddingEnd="8dp"
+            app:tint="#005CCC"
+            app:layout_constraintStart_toEndOf="@id/approachRecycler"
+            app:layout_constraintTop_toBottomOf="@id/addApproach"
+            app:layout_constraintBottom_toBottomOf="@id/approachRecycler"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/approachRecycler"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -75,19 +103,21 @@
         app:layout_constraintTop_toBottomOf="@id/exerciseName"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/addApproach"
+        app:layout_constraintBottom_toTopOf="@id/deleteExercise"
         tools:listitem="@layout/item_approach"
-        app:reverseLayout="true"
         />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/exerciseNote"
             style="@style/Input"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="@string/exercise_note_hint"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/approachRecycler">
+            app:layout_constraintEnd_toStartOf="@id/deleteExercise"
+            app:layout_constraintTop_toBottomOf="@id/approachRecycler"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="gone">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/exerciseNoteEditText"
@@ -97,6 +127,46 @@
                 tools:text="Notes"/>
 
         </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageButton
+            android:id="@+id/addNotesButton"
+            android:src="@drawable/ic_pencil"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            app:tint="#424242"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/approachRecycler"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:elevation="2dp"
+            />
+
+        <TextView
+            android:id="@+id/addNotesTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/addNotesButton"
+            app:layout_constraintTop_toBottomOf="@id/approachRecycler"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@string/add_notes"
+            />
+
+        <ImageButton
+            android:id="@+id/deleteExercise"
+            android:src="@drawable/ic_delete"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            app:tint="#424242"
+            app:layout_constraintStart_toStartOf="@id/addApproach"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/approachRecycler"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:elevation="2dp"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

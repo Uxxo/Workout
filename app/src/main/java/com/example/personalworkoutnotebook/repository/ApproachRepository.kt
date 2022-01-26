@@ -32,7 +32,7 @@ class ApproachRepository @Inject constructor(
 
     suspend fun save(approach: Approach) : Approach{
         return withContext(Dispatchers.IO){
-            if(approachDao.isExist(approach.id)){
+            if(approachDao.getOneById(approach.id) != null){
                 approachDao.update(approach.toRoom())
                 approachDao.getOneById(approach.id)!!.toModel()
             } else{

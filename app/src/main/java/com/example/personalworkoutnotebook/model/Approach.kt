@@ -13,12 +13,17 @@ data class Approach(
     val repeat:Int,
 ) : Serializable
 
-@Entity(tableName = "approaches")
+@Entity(tableName = "approaches",foreignKeys = [
+    ForeignKey(entity = RoomExercise::class,
+    parentColumns = ["id"],
+    childColumns = ["exercise_id"],
+    onDelete = ForeignKey.CASCADE)
+])
 data class RoomApproach(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long,
     @ColumnInfo(name = "mass") val mass: Double,
     @ColumnInfo(name = "repeat") val repeat: Int,
-    @ColumnInfo(name = "exercise_id") val exerciseId: Long
+    @ColumnInfo(name = "exercise_id", index = true) val exerciseId: Long
 )
 
 fun Approach.toRoom() = RoomApproach(
@@ -34,3 +39,6 @@ fun RoomApproach.toModel() = Approach(
     repeat = this.repeat,
     exerciseId = this.exerciseId
 )
+
+
+

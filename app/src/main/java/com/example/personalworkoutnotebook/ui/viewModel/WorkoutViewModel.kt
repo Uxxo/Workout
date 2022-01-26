@@ -1,174 +1,256 @@
 package com.example.personalworkoutnotebook.ui.viewModel
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.personalworkoutnotebook.DBFactory
-import com.example.personalworkoutnotebook.R
 import com.example.personalworkoutnotebook.model.Approach
 import com.example.personalworkoutnotebook.model.Exercise
+import com.example.personalworkoutnotebook.model.Group
+import com.example.personalworkoutnotebook.model.WorkoutTimer
 import com.example.personalworkoutnotebook.model.Workout
 import com.example.personalworkoutnotebook.repository.ApproachRepository
 import com.example.personalworkoutnotebook.repository.ExerciseRepository
+import com.example.personalworkoutnotebook.repository.WorkoutTimerRepository
 import com.example.personalworkoutnotebook.repository.WorkoutRepository
+import com.example.personalworkoutnotebook.ui.WorkoutDataService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.*
 import javax.inject.Inject
+
 
 @HiltViewModel
 class WorkoutViewModel @Inject constructor(
     private val workoutRepository: WorkoutRepository,
     private val exerciseRepository: ExerciseRepository,
     private val approachRepository: ApproachRepository,
-    private val dbFactory: DBFactory
+    private val timerRepository: WorkoutTimerRepository,
+
+
+//    private val dbFactory: DBFactory
 ) : ViewModel() {
+
+
+    private var allExercise: List<Exercise?> = listOf()
+
     private var _isLoading = MutableLiveData<Boolean>()
+
     val isLoading: LiveData<Boolean>
         get() = _isLoading
 
-    // Скрытый объект LiveData, содержимое которого можно менять
-    private var _workouts = MutableLiveData<List<Workout>>()
 
-    // Объект-фасад, используемый снаружи (getter)
+    private var _workouts = MutableLiveData<List<Workout>>()
     val workouts: LiveData<List<Workout>>
         get() = _workouts
 
     private var _workout = MutableLiveData<Workout>()
+
     val workout: LiveData<Workout>
         get() = _workout
 
-    private var idValue: Long = -1
+    private var _exercise = MutableLiveData<Exercise>()
+    val exercise:LiveData<Exercise>
+        get() = _exercise
 
-    suspend fun updateWorkoutData(){
-        _workout.postValue(workoutRepository.getById(_workout.value!!.id))
+    private var _exercisesGraphData = MutableLiveData<List<Double>>()
+    val exerciseGraphData:LiveData<List<Double>>
+        get() = _exercisesGraphData
+
+    private var _groups = MutableLiveData<List<Group>>()
+    val groups: LiveData<List<Group>>
+        get() = _groups
+
+    private var _uniqueExercises = MutableLiveData<List<Exercise>>()
+    val uniqueExercises: LiveData<List<Exercise>>
+        get() = _uniqueExercises
+
+
+    suspend fun loadWorkoutById(id: Long) {
+        _workout.value = workoutRepository.getById(id)
     }
 
-    suspend fun loadWorkoutById(context: Context, id: Long) {
-        idValue = id
-        if (id == -1L) {
-            idValue = createWorkout(context)
-        }
-        _workout.postValue(workoutRepository.getById(idValue))
-    }
 
     suspend fun loadData() {
         _isLoading.postValue(true)
-
-        // загружаем данные и помещаем их в объект LiveData
-        _workouts.postValue(workoutRepository.getAll().sortedByDescending { it.date.timeInMillis })
-
+        _workouts.value = workoutRepository.getAll().sortedBy { it.date.timeInMillis }
         _isLoading.postValue(false)
 
     }
 
-    suspend fun updateViewModel(workoutId: Long){
-        _isLoading.postValue(true)
-        val workout : Workout? = workoutRepository.getById(workoutId)
-        if(workout != null){_workout.postValue(workout!!)}
-
-        _isLoading.postValue(false)
+    suspend fun loadExerciseById(id: Long){
+        _exercise.value = exerciseRepository.getById(id)
     }
 
-    suspend fun updateWorkout(newWorkout: Workout) {
+    suspend fun saveWorkout(newWorkout: Workout) {
         workoutRepository.save(newWorkout)
     }
 
-    private suspend fun createWorkout(context: Context): Long {
+    suspend fun createWorkout(): Workout {
         val newWorkout = Workout(
-            name = context.getString(R.string.new_workout_title),
+            name = "",
             date = Calendar.getInstance(),
-            exercises = mutableListOf()
+            exercises = mutableListOf(),
+            status = Workout.CREATED,
+            timers = mutableListOf()
         )
-        return workoutRepository.save(newWorkout).id
+        val createdWorkout = workoutRepository.save(newWorkout)
+         addNewTimersToWorkout(createdWorkout.id)
+         return createdWorkout
+    }
+
+    suspend fun duplicateWorkout(workout: Workout){
+        val newWorkout = createWorkout()
+        val editedWorkout = workout.copy(id = newWorkout.id, exercises = mutableListOf(),
+                                        date = newWorkout.date, status = newWorkout.status)
+        saveWorkout(editedWorkout)
+
+        val originExercises = workout.exercises
+        originExercises.forEach { exercise ->
+           val newExerciseId = saveExercise(exercise.copy(id = 0, workoutId = newWorkout.id))
+
+            exercise.approaches.forEach { approach ->
+               saveApproach(approach.copy(id = 0, exerciseId = newExerciseId, repeat = 0 ))
+            }
+        }
+        loadData()
     }
 
     suspend fun deleteWorkout(workout: Workout) {
+
         _isLoading.postValue(true)
-        val changingListWorkout: MutableList<Workout> = _workouts.value!!.toMutableList()
-        changingListWorkout.remove(workout)
-        _workouts.postValue(changingListWorkout)
-        _isLoading.postValue(false)
 
-        workoutRepository.delete(workout.id)
+        workoutRepository.delete(workout)
+
+        loadData()
+        _isLoading.postValue(false)
     }
 
-    suspend fun deleteExercise(exercise: Exercise) {
+    private suspend fun addNewTimersToWorkout(workoutId: Long): List<WorkoutTimer> {
+        val newTimer1 = createTimer(workoutId)
+        val newTimer2 = createTimer(workoutId)
+
+        timerRepository.save(newTimer1)
+        timerRepository.save(newTimer2)
+
+        return listOf(newTimer1, newTimer2)
+    }
+
+    private fun createTimer(workoutId: Long) : WorkoutTimer{
+        return WorkoutTimer(
+            id = 0L,
+            workoutId = workoutId,
+            minutes = 0,
+            seconds = 0
+        )
+    }
+
+    suspend fun saveTimer(timer : WorkoutTimer){
+        timerRepository.save(timer)
+    }
+
+    private suspend fun loadAllExercises():List<Exercise?> {
+        allExercise = exerciseRepository.getAll()
+        return allExercise
+    }
+
+    suspend fun loadUniqueExercises(){
+        val exercises = loadAllExercises()
+        val uniqueExercises = WorkoutDataService().getUniqueExercisesWithMaxMass(exercises)
+        _uniqueExercises.value = uniqueExercises
+    }
+
+    private fun createNewExercise(workoutId: Long): Exercise {
+        return Exercise(
+            id = 0L,
+            workoutId = workoutId,
+            name = "",
+            notes = null,
+            group = ""
+        )
+    }
+
+    suspend fun addNewExerciseToWorkout(workoutId: Long) {
+
+        val newExercise = createNewExercise(workoutId)
+
+        val savedExercise = exerciseRepository.save(newExercise)
+        val approachesList = mutableListOf<Approach>()
+        for (i in 1..4) {
+            val savedApproach = approachRepository.save(createNewApproach(savedExercise.id))
+            approachesList.add(savedApproach)
+        }
+        val updatedExercise = savedExercise.copy(approaches = approachesList)
+
+        exerciseRepository.save(updatedExercise)
+
+        val workout = workoutRepository.getById(workoutId) ?: return
+        _workout.value = workout
+    }
+
+    suspend fun deleteExercise(exerciseId: Long) {
         _isLoading.postValue(true)
-        val existingWorkout = _workout.value ?: return
-        val existingExerciseList = existingWorkout.exercises as MutableList
-        existingExerciseList.remove(exercise)
-        _workout.postValue(existingWorkout.copy(exercises = existingExerciseList))
+
+        val exerciseForDelete = exerciseRepository.getById(exerciseId) ?: return
+        exerciseRepository.delete(exerciseForDelete)
+
+        val updatedWorkout = workoutRepository.getById(exerciseForDelete.workoutId) ?: return
+
+        _workout.value = updatedWorkout
+
         _isLoading.postValue(false)
-        exerciseRepository.delete(exercise)
     }
 
-    suspend fun saveExercise(exercise: Exercise) {
-        exerciseRepository.save(exercise)
+    private fun createNewApproach(exerciseId: Long): Approach {
+        return Approach(id = 0L, exerciseId = exerciseId, mass = 0.0, repeat = 0)
     }
 
-    suspend fun saveApproach(approach: Approach){
+    suspend fun saveExercise(exercise: Exercise): Long {
+        return exerciseRepository.save(exercise).id
+    }
+
+    suspend fun loadExercisesDataForGraphic(id: Long){
+        val exercise = exerciseRepository.getById(id) ?: return
+        val exerciseList = if (exercise.group != null) {
+            exerciseRepository.getExerciseByName(exercise.name, exercise.group)
+        } else {
+            exerciseRepository.getExerciseByName(exercise.name, "")
+        }
+        _exercisesGraphData.value = WorkoutDataService().getMaxApproachesInfoForGraphic(exerciseList)
+    }
+
+    suspend fun saveApproach(approach: Approach) {
         approachRepository.save(approach)
-        val exitingWorkout = _workout.value ?: return
-        val existingExercise = exitingWorkout.exercises.first { it.id == approach.exerciseId }
-        val existingApproachList = existingExercise.approaches as MutableList
-        existingApproachList.add(approach)
-        val updatedExercise = existingExercise.copy(approaches = existingApproachList)
-        val existingExerciseList = exitingWorkout.exercises as MutableList
-        existingExerciseList.add(updatedExercise)
-        val updatedWorkout = exitingWorkout.copy(exercises = existingExerciseList)
-        _workout.postValue(updatedWorkout)
     }
 
     suspend fun deleteApproach(approach: Approach) {
         approachRepository.delete(approach.id)
     }
 
-    suspend fun addNewExerciseToWorkout(context: Context, workout: Workout){
-        val savedExercise = exerciseRepository.save(createNewExercise(context, workout))
-        val newApproachesList = mutableListOf<Approach>()
-        for (i in 1..4){
-            newApproachesList.add(approachRepository.save(createNewApproach(savedExercise)))
-        }
-        val updatedExercise = savedExercise.copy(approaches = newApproachesList)
-        val exerciseListForUpdate = workout.exercises as MutableList
-        exerciseListForUpdate.add(updatedExercise)
-        val updatedWorkout = workout.copy(exercises = exerciseListForUpdate)
-        workoutRepository.save(updatedWorkout)
-        _workout.postValue(updatedWorkout)
+    suspend fun addApproachToExercise(exerciseId: Long) {
+        _isLoading.postValue(true)
+        approachRepository.save(createNewApproach(exerciseId))
+        val updatedExercise = exerciseRepository.getById(exerciseId) ?: return
+        val updatedWorkout = workoutRepository.getById(updatedExercise.workoutId) ?: return
+        _workout.value = updatedWorkout
+        _isLoading.postValue(false)
     }
 
-    suspend fun addApproachToExercise(exercise: Exercise){
-        val existingWorkout = _workout.value ?: return
-        val savedApproach = approachRepository.save(createNewApproach(exercise))
+    suspend fun copyWorkoutToBuffer(workoutId: Long, context: Context){
+        val findWorkout = workoutRepository.getById(workoutId) ?: return
+        val outputString = WorkoutDataService().workoutAsString(findWorkout)
 
-
-//        val editedApproachList = exercise.approaches as MutableList
-//        editedApproachList.add(savedApproach)
-//        val updatedExercise = exercise.copy(approaches = editedApproachList)
-//
-//        val editedExerciseList = existingWorkout.exercises as MutableList
-//        val index = editedExerciseList.indexOf(editedExerciseList.first { it.id == exercise.id })
-//        editedExerciseList.removeAt(index)
-//        editedExerciseList[index] = updatedExercise
-//        val updatedWorkout = existingWorkout.copy(exercises = editedExerciseList)
-//        _workout.postValue(updatedWorkout)
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("Workout", outputString)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText( context,"Workout copied to buffer", Toast.LENGTH_SHORT).show()
     }
 
-    private suspend fun createNewApproach(exercise: Exercise) : Approach {
-        return Approach(id = 0L, exerciseId = exercise.id, mass = 0.0, repeat = 0)
+    suspend fun loadAllExercisesGroup(){
+        val exercises = exerciseRepository.getAll()
+        _groups.value = WorkoutDataService().getGroupList(exercises)
     }
 
-    private suspend fun createNewExercise(context: Context, workout: Workout): Exercise {
-        return Exercise(
-            id = 0L,
-            workoutId = workout.id,
-            name = context.getString(R.string.exercise_title),
-            notes = null
-        )
-    }
-
-    suspend fun createTestDB() {
-        dbFactory.testCreateDB()
-    }
 }

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="8dp"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
+
+
+    <TextView
+        android:id="@+id/workoutDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toTopOf="@id/startAndFinishButton"
+        app:layout_constraintEnd_toStartOf="@id/workoutTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="workout date" />
+
+    <ImageButton
+        android:id="@+id/startAndFinishButton"
+        style="@style/Widget.MaterialComponents.FloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/workoutTitle"
+        app:layout_constraintBottom_toBottomOf="@id/workoutTitle"
+        android:paddingBottom="-2dp"
+        app:tint="#424242"
+        />
+
+
+    <ImageButton
+    android:id="@+id/workoutCopy"
+    android:src="@drawable/ic_copy"
+    style="@style/Widget.MaterialComponents.FloatingActionButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingStart="4dp"
+        android:layout_marginTop="3dp"
+    app:tint="#424242"
+    app:layout_constraintTop_toBottomOf="@id/workoutTitle"
+    app:layout_constraintBottom_toTopOf="@id/exerciseRecycler"
+    app:layout_constraintEnd_toStartOf="@id/deleteWorkout"
+    />
+
+    <ImageButton
+    android:id="@+id/deleteWorkout"
+    android:src="@drawable/ic_delete"
+    style="@style/Widget.MaterialComponents.FloatingActionButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    app:tint="#424242"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/workoutTitle"
+    app:layout_constraintBottom_toTopOf="@id/exerciseRecycler"
+    />
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/workoutTitle"
+        style="@style/Input"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/startAndFinishButton"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/deleteWorkout"
+        android:hint="@string/new_workout_title"
+        tools:text="workout name"
+        android:focusableInTouchMode="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/workoutTitleEditText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:singleLine="true"
+            />
+
+
+
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/exerciseRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@id/startNewExercise"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/deleteWorkout"
+        tools:listitem="@layout/item_exercise"
+        app:reverseLayout="false"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/startNewExercise"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/exerciseRecycler"
+        android:text="@string/start_new_exercise"
+        android:textColor="#424242"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/timer_1"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/exerciseRecycler"
+        app:layout_constraintEnd_toStartOf="@id/timer_2"
+        android:text="@string/timer_1"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/timer_2"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/exerciseRecycler"
+        android:text="@string/timer_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+
+    <FrameLayout
+        android:id="@+id/workoutProgressLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:visibility="gone"
+        >
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            />
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

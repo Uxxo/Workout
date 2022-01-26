@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView
+
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_set_timer_dialog"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="8dp"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    android:elevation="5dp"
+    android:layout_gravity="center">
+
+    <TimePicker
+        android:id="@+id/set_timers_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:timePickerMode="spinner"
+        />
+
+
+
+</androidx.cardview.widget.CardView>
+
+
+
+

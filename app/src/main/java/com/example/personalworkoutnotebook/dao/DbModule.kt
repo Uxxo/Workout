@@ -24,6 +24,18 @@ object DbModule {
     @Singleton
     fun provideApproachDao(): ApproachDao = db.approachDao()
 
+    @Provides
+    @Singleton
+    fun provideTimerDao(): TimerDao = db.timerDao()
+
+    @Provides
+    @Singleton
+    fun provideBioParameterDao(): BioParameterDao = db.bioParameterDao()
+
+    @Provides
+    @Singleton
+    fun provideBioParameterValueDao(): BioParameterValueDao = db.bioParameterValueDao()
+
     private lateinit var db: AppDatabase
     fun initDb(context: Context) {
         if (::db.isInitialized) throw IllegalStateException("Room instance already initialized!")

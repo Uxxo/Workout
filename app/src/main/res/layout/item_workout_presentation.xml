@@ -16,12 +16,10 @@
         android:layout_margin="8dp">
 
         <TextView
+            style="@style/TitleStyle"
             android:id="@+id/workoutName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:text="TextView"
-            android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/workoutDate"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -31,27 +29,26 @@
             android:id="@+id/workoutDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView"
-            android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/workoutName"
             tools:text="10.10.21" />
 
 
+
+
         <ImageButton
-            android:id="@+id/deleteWorkout"
+            android:id="@+id/workout_delete"
             android:src="@drawable/ic_delete"
             style="@style/Widget.MaterialComponents.FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:paddingStart="8dp"
+            android:paddingStart="4dp"
             android:paddingEnd="8dp"
             app:tint="#424242"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="@id/workoutDate"
-            android:elevation="2dp"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -2,27 +2,45 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.personalworkoutnotebook">
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <application
         android:name=".App"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PersonalWorkoutNotebook">
-        <activity android:name=".ui.activity.MainActivity">
+
+
+        <service
+            android:name=".service.CountDownService"
+            android:enabled="true"
+            android:exported="false"></service>
+
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.activity.CreateNewWorkoutActivity"
-            android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait"
-            />
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".ui.activity.ExercisesActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.ExerciseInfoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.BioParametersActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
