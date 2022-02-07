@@ -2,8 +2,8 @@
     <string name="app_name">Personal Workout Notebook</string>
     <string name="exercise_title_hint">Exercise Name</string>
     <string name="exercise_title_helper">Name the exercise</string>
-    <string name="approach_mass">Kg</string>
-    <string name="approach_repeats">Rp</string>
+    <string name="set_mass">Kg</string>
+    <string name="set_repeats">Rp</string>
     <string name="exercise_note_hint">Notes</string>
     <string name="exercise_note_helper">Notes for the Exercise</string>
     <string name="new_workout_title">New workout</string>

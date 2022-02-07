@@ -7,12 +7,12 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.personalworkoutnotebook.model.Approach
+import com.example.personalworkoutnotebook.model.Set
 import com.example.personalworkoutnotebook.model.Exercise
 import com.example.personalworkoutnotebook.model.Group
 import com.example.personalworkoutnotebook.model.WorkoutTimer
 import com.example.personalworkoutnotebook.model.Workout
-import com.example.personalworkoutnotebook.repository.ApproachRepository
+import com.example.personalworkoutnotebook.repository.SetRepository
 import com.example.personalworkoutnotebook.repository.ExerciseRepository
 import com.example.personalworkoutnotebook.repository.WorkoutTimerRepository
 import com.example.personalworkoutnotebook.repository.WorkoutRepository
@@ -26,7 +26,7 @@ import javax.inject.Inject
 class WorkoutViewModel @Inject constructor(
     private val workoutRepository: WorkoutRepository,
     private val exerciseRepository: ExerciseRepository,
-    private val approachRepository: ApproachRepository,
+    private val setRepository: SetRepository,
     private val timerRepository: WorkoutTimerRepository,
 
 
@@ -111,8 +111,8 @@ class WorkoutViewModel @Inject constructor(
         originExercises.forEach { exercise ->
            val newExerciseId = saveExercise(exercise.copy(id = 0, workoutId = newWorkout.id))
 
-            exercise.approaches.forEach { approach ->
-               saveApproach(approach.copy(id = 0, exerciseId = newExerciseId, repeat = 0 ))
+            exercise.sets.forEach { set ->
+               saveSet(set.copy(id = 0, exerciseId = newExerciseId, repeat = 0 ))
             }
         }
         loadData()
@@ -177,12 +177,12 @@ class WorkoutViewModel @Inject constructor(
         val newExercise = createNewExercise(workoutId)
 
         val savedExercise = exerciseRepository.save(newExercise)
-        val approachesList = mutableListOf<Approach>()
+        val setsList = mutableListOf<Set>()
         for (i in 1..4) {
-            val savedApproach = approachRepository.save(createNewApproach(savedExercise.id))
-            approachesList.add(savedApproach)
+            val savedSet = setRepository.save(createNewSet(savedExercise.id))
+            setsList.add(savedSet)
         }
-        val updatedExercise = savedExercise.copy(approaches = approachesList)
+        val updatedExercise = savedExercise.copy(sets = setsList)
 
         exerciseRepository.save(updatedExercise)
 
@@ -203,8 +203,8 @@ class WorkoutViewModel @Inject constructor(
         _isLoading.postValue(false)
     }
 
-    private fun createNewApproach(exerciseId: Long): Approach {
-        return Approach(id = 0L, exerciseId = exerciseId, mass = 0.0, repeat = 0)
+    private fun createNewSet(exerciseId: Long): Set {
+        return Set(id = 0L, exerciseId = exerciseId, mass = 0.0, repeat = 0)
     }
 
     suspend fun saveExercise(exercise: Exercise): Long {
@@ -218,20 +218,20 @@ class WorkoutViewModel @Inject constructor(
         } else {
             exerciseRepository.getExerciseByName(exercise.name, "")
         }
-        _exercisesGraphData.value = WorkoutDataService().getMaxApproachesInfoForGraphic(exerciseList)
+        _exercisesGraphData.value = WorkoutDataService().getMaxSetsInfoForGraphic(exerciseList)
     }
 
-    suspend fun saveApproach(approach: Approach) {
-        approachRepository.save(approach)
+    suspend fun saveSet(set: Set) {
+        setRepository.save(set)
     }
 
-    suspend fun deleteApproach(approach: Approach) {
-        approachRepository.delete(approach.id)
+    suspend fun deleteSet(set: Set) {
+        setRepository.delete(set.id)
     }
 
-    suspend fun addApproachToExercise(exerciseId: Long) {
+    suspend fun addSetToExercise(exerciseId: Long) {
         _isLoading.postValue(true)
-        approachRepository.save(createNewApproach(exerciseId))
+        setRepository.save(createNewSet(exerciseId))
         val updatedExercise = exerciseRepository.getById(exerciseId) ?: return
         val updatedWorkout = workoutRepository.getById(updatedExercise.workoutId) ?: return
         _workout.value = updatedWorkout

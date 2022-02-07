@@ -12,7 +12,7 @@ import com.example.personalworkoutnotebook.R
 import com.example.personalworkoutnotebook.databinding.ItemExerciseBinding
 import com.example.personalworkoutnotebook.databinding.ItemExercisePresentationBinding
 import com.example.personalworkoutnotebook.extension.afterTextChanged
-import com.example.personalworkoutnotebook.model.Approach
+import com.example.personalworkoutnotebook.model.Set
 import com.example.personalworkoutnotebook.model.Exercise
 import com.example.personalworkoutnotebook.model.Workout
 import com.example.personalworkoutnotebook.model.getMaxMass
@@ -71,11 +71,11 @@ class ExerciseAdapter(
     inner class ExerciseHolder(private val exerciseBinding: ItemExerciseBinding) :
         RecyclerView.ViewHolder(exerciseBinding.root) {
 
-        private lateinit var approachRecycle: RecyclerView
+        private lateinit var setRecycler: RecyclerView
 
         fun bind(exercise: Exercise) {
 
-            val approachAdapter = ApproachAdapter(exercise.approaches as MutableList, callback)
+            val setAdapter = SetAdapter(exercise.sets as MutableList, callback)
 
             exerciseBinding.root.tag = exerciseList.indexOf(exercise)
             exerciseBinding.deleteExercise.setOnClickListener {
@@ -114,15 +114,15 @@ class ExerciseAdapter(
                     if(!onBind){
 
                         val editedExercise = updateExercise(exercise, newName, newGroup, maxMass)
-                        callback.invoke(ViewEvent.SaveApproach(editedExercise.approaches[0]))
+                        callback.invoke(ViewEvent.SaveSet(editedExercise.sets[0]))
                         callback.invoke(ViewEvent.SaveExercise(editedExercise))
 
                         exerciseBinding.exerciseNameEditText.setText(editedExercise.name)
                         exerciseBinding.exerciseGroupEditText.setText(editedExercise.group)
 
-                        if (exerciseBinding.approachRecycler.visibility == View.VISIBLE){
-                            val newApproachAdapter = ApproachAdapter(editedExercise.approaches.toMutableList(), callback)
-                            approachRecycle.adapter = newApproachAdapter
+                        if (exerciseBinding.setRecycler.visibility == View.VISIBLE){
+                            val newSetAdapter = SetAdapter(editedExercise.sets.toMutableList(), callback)
+                            setRecycler.adapter = newSetAdapter
                         }
                         exerciseBinding.exerciseGroup.visibility = View.VISIBLE
                     }
@@ -173,30 +173,30 @@ class ExerciseAdapter(
             }
 
             if(workoutStatus == Workout.IN_PROCESS){
-                exerciseBinding.approachRecycler.adapter = ApproachAdapter(mutableListOf(), callback)
+                exerciseBinding.setRecycler.adapter = SetAdapter(mutableListOf(), callback)
 
-                approachRecycle = exerciseBinding.approachRecycler
-                approachRecycle.adapter = approachAdapter
+                setRecycler = exerciseBinding.setRecycler
+                setRecycler.adapter = setAdapter
 
-                exerciseBinding.addApproach.setOnClickListener {
-                    callback.invoke(ViewEvent.AddApproachToExercise(exercise))
+                exerciseBinding.addSet.setOnClickListener {
+                    callback.invoke(ViewEvent.AddSetToExercise(exercise))
                 }
 
-                exerciseBinding.deleteApproach.setOnClickListener {
-                if(exercise.approaches.size > 1){
-                    val approach = exercise.approaches[exercise.approaches.size -1]
-                    callback.invoke(ViewEvent.DeleteApproach(approach))
-                    val newApproachesList = exercise.approaches
-                    newApproachesList.remove(approach)
-                    val newAdapter = ApproachAdapter(newApproachesList, callback)
-                    approachRecycle.adapter = newAdapter
+                exerciseBinding.deleteSet.setOnClickListener {
+                if(exercise.sets.size > 1){
+                    val set = exercise.sets[exercise.sets.size -1]
+                    callback.invoke(ViewEvent.DeleteSet(set))
+                    val newSetsList = exercise.sets
+                    newSetsList.remove(set)
+                    val newAdapter = SetAdapter(newSetsList, callback)
+                    setRecycler.adapter = newAdapter
                     newAdapter.notifyDataSetChanged()
                 }
                 }
 
             } else {
-                exerciseBinding.approachRecycler.visibility = View.GONE
-                exerciseBinding.addApproach.visibility = View.GONE
+                exerciseBinding.setRecycler.visibility = View.GONE
+                exerciseBinding.addSet.visibility = View.GONE
             }
 
             if(exercise.notes == null || exercise.notes.isEmpty()){
@@ -251,7 +251,7 @@ class ExerciseAdapter(
 
         fun bind(exercise:Exercise){
             exerciseBinding.exerciseTitle.text = exercise.name
-            exerciseBinding.approachesInf.text = getExerciseMaxMass(exercise)
+            exerciseBinding.setsInf.text = getExerciseMaxMass(exercise)
 
             exerciseBinding.exerciseTitle.setOnClickListener{
                 val intent = ExerciseInfoActivity.getIntent(context, exercise.id)
@@ -262,14 +262,14 @@ class ExerciseAdapter(
     }
 
     private fun getExerciseMaxMass(exercise: Exercise): String{
-        if(exercise.approaches.isEmpty()) return ""
+        if(exercise.sets.isEmpty()) return ""
         var returnedString = ""
-        var maxMass = exercise.approaches[0].mass
-        var repeat = exercise.approaches[0].repeat
-        exercise.approaches.forEach { approach ->
-            if(approach.mass > maxMass && approach.repeat !=0){
-                maxMass = approach.mass
-                repeat = approach.repeat
+        var maxMass = exercise.sets[0].mass
+        var repeat = exercise.sets[0].repeat
+        exercise.sets.forEach { set ->
+            if(set.mass > maxMass && set.repeat !=0){
+                maxMass = set.mass
+                repeat = set.repeat
             }
         }
 
@@ -293,17 +293,17 @@ class ExerciseAdapter(
     }
 
     private fun updateExercise(exerciseForUpdate: Exercise, newName: String, newGroup: String?, maxMass: Double): Exercise {
-        val approachesList = exerciseForUpdate.approaches
-        val newApproachesList = mutableListOf<Approach>()
+        val setsList = exerciseForUpdate.sets
+        val newSetsList = mutableListOf<Set>()
 
-        approachesList.forEach { approach ->
-            if (approachesList.indexOf(approach) == 0) {
-                val editedApproach = approach.copy(mass = maxMass)
-                newApproachesList.add(0,editedApproach)
-            } else {newApproachesList.add(approach)}
+        setsList.forEach { set ->
+            if (setsList.indexOf(set) == 0) {
+                val editedSet = set.copy(mass = maxMass)
+                newSetsList.add(0,editedSet)
+            } else {newSetsList.add(set)}
         }
 
-        return exerciseForUpdate.copy(name = newName, group = newGroup, approaches = newApproachesList)
+        return exerciseForUpdate.copy(name = newName, group = newGroup, sets = newSetsList)
     }
 
 }

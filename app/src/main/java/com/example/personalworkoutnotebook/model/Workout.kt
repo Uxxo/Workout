@@ -35,10 +35,10 @@ data class RoomWorkout(
 )
 
 
-data class RoomWorkoutWithTimersExercisesAndApproaches(
+data class RoomWorkoutWithTimersExercisesAndSets(
     @Embedded val roomWorkout: RoomWorkout,
     @Relation(parentColumn = "id", entityColumn = "workout_id", entity = RoomExercise::class)
-    val exercises : List<RoomExerciseWithApproach>,
+    val exercises : List<RoomExerciseWithSet>,
 
     @Relation(parentColumn = "id", entityColumn = "workout_id", entity = RoomTimer::class)
     val timers: List<RoomTimer>
@@ -57,7 +57,7 @@ fun Workout.toRoom() = RoomWorkout(
     status = this.status
 )
 
-fun RoomWorkoutWithTimersExercisesAndApproaches.toModel() = Workout(
+fun RoomWorkoutWithTimersExercisesAndSets.toModel() = Workout(
     id = this.roomWorkout.id,
     date = this.roomWorkout.date,
     name = this.roomWorkout.name,

@@ -1,7 +1,6 @@
 package com.example.personalworkoutnotebook.repository
 
 import com.example.personalworkoutnotebook.dao.ExerciseDao
-import com.example.personalworkoutnotebook.extension.toFirstUpperCase
 import com.example.personalworkoutnotebook.model.Exercise
 import com.example.personalworkoutnotebook.model.toModel
 import com.example.personalworkoutnotebook.model.toRoom
@@ -12,14 +11,14 @@ import javax.inject.Inject
 class ExerciseRepository @Inject constructor(
 
     private val exerciseDao: ExerciseDao,
-    private val approachRepository: ApproachRepository
+    private val setRepository: SetRepository
 ) {
 
     suspend fun getAll(): List<Exercise?> {
         return withContext(Dispatchers.IO) {
             val exerciseList: MutableList<Exercise> = mutableListOf()
-            exerciseDao.getExercisesWithApproaches()?.forEach { roomExerciseWithApproach ->
-                exerciseList.add(roomExerciseWithApproach.toModel())
+            exerciseDao.getExercisesWithSets()?.forEach { roomExerciseWithSet ->
+                exerciseList.add(roomExerciseWithSet.toModel())
             }
             exerciseList
         }
@@ -28,9 +27,9 @@ class ExerciseRepository @Inject constructor(
     suspend fun getExerciseByName(name: String, group: String): List<Exercise>{
         return withContext(Dispatchers.IO){
             val exerciseList: MutableList<Exercise> = mutableListOf()
-            exerciseDao.getExercisesWithApproachesByExerciseName(name)?.forEach { roomExerciseWithApproach ->
-                if(roomExerciseWithApproach.exercise.group == group) {
-                    exerciseList.add(roomExerciseWithApproach.toModel())
+            exerciseDao.getExercisesWithSetsByExerciseName(name)?.forEach { roomExerciseWithSet ->
+                if(roomExerciseWithSet.exercise.group == group) {
+                    exerciseList.add(roomExerciseWithSet.toModel())
                 }
             }
             exerciseList
@@ -46,8 +45,8 @@ class ExerciseRepository @Inject constructor(
     suspend fun getByWorkoutId(id: Long): List<Exercise> {
         return withContext(Dispatchers.IO) {
             val exerciseList: MutableList<Exercise> = mutableListOf()
-            exerciseDao.getExercisesByWorkoutId(id)?.forEach { roomExerciseWithApproach ->
-                exerciseList.add(roomExerciseWithApproach.toModel())
+            exerciseDao.getExercisesByWorkoutId(id)?.forEach { roomExerciseWithSet ->
+                exerciseList.add(roomExerciseWithSet.toModel())
             }
             return@withContext exerciseList
         }
@@ -62,7 +61,7 @@ class ExerciseRepository @Inject constructor(
 
             } else {
                 val id = exerciseDao.insert(exercise.toRoom())
-                exercise.approaches.forEach { approach -> approachRepository.save(approach) }
+                exercise.sets.forEach { set -> setRepository.save(set) }
                 exerciseDao.getOneById(id)!!.toModel()
 
             }

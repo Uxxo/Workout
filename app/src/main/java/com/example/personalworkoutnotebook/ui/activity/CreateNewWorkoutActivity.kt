@@ -247,11 +247,11 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
         )
         { event ->
             when(event) {
-                is ViewEvent.SaveApproach -> lifecycleScope.launch { workoutViewModel.saveApproach(event.approach) }
-                is ViewEvent.DeleteApproach -> lifecycleScope.launch { workoutViewModel.deleteApproach(event.approach) }
+                is ViewEvent.SaveSet -> lifecycleScope.launch { workoutViewModel.saveSet(event.set) }
+                is ViewEvent.DeleteSet -> lifecycleScope.launch { workoutViewModel.deleteSet(event.set) }
                 is ViewEvent.SaveExercise -> lifecycleScope.launch { workoutViewModel.saveExercise(event.exercise) }
                 is ViewEvent.DeleteExercise -> lifecycleScope.launch { workoutViewModel.deleteExercise(event.exercise.id) }
-                is ViewEvent.AddApproachToExercise -> lifecycleScope.launch { workoutViewModel.addApproachToExercise(event.exercise.id) }
+                is ViewEvent.AddSetToExercise -> lifecycleScope.launch { workoutViewModel.addSetToExercise(event.exercise.id) }
             }
 
         }

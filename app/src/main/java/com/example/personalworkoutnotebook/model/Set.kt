@@ -6,38 +6,38 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.io.Serializable
 
-data class Approach(
+data class Set(
     var id:Long = 0L,
     val exerciseId: Long,
     val mass:Double,
     val repeat:Int,
 ) : Serializable
 
-@Entity(tableName = "approaches",foreignKeys = [
+@Entity(tableName = "set",foreignKeys = [
     ForeignKey(entity = RoomExercise::class,
     parentColumns = ["id"],
     childColumns = ["exercise_id"],
     onDelete = ForeignKey.CASCADE)
 ])
-data class RoomApproach(
+data class RoomSet(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long,
     @ColumnInfo(name = "mass") val mass: Double,
     @ColumnInfo(name = "repeat") val repeat: Int,
     @ColumnInfo(name = "exercise_id", index = true) val exerciseId: Long
 )
 
-fun Approach.toRoom() = RoomApproach(
+fun Set.toRoom() = RoomSet(
     id = this.id,
     mass = this.mass,
     repeat = this.repeat,
     exerciseId = this.exerciseId
 )
 
-fun RoomApproach.toModel() = Approach(
-    id = this.id,
-    mass = this.mass,
-    repeat = this.repeat,
-    exerciseId = this.exerciseId
+fun RoomSet.toModel() = Set(
+    id = id,
+    mass = mass,
+    repeat = repeat,
+    exerciseId = exerciseId
 )
 
 

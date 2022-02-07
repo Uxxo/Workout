@@ -22,7 +22,7 @@ object DbModule {
 
     @Provides
     @Singleton
-    fun provideApproachDao(): ApproachDao = db.approachDao()
+    fun provideSetDao(): SetDao = db.setDao()
 
     @Provides
     @Singleton

@@ -2,7 +2,7 @@ package com.example.personalworkoutnotebook.dao
 
 import androidx.room.*
 import com.example.personalworkoutnotebook.model.RoomWorkout
-import com.example.personalworkoutnotebook.model.RoomWorkoutWithTimersExercisesAndApproaches
+import com.example.personalworkoutnotebook.model.RoomWorkoutWithTimersExercisesAndSets
 
 @Dao
 interface WorkoutDao {
@@ -18,11 +18,11 @@ interface WorkoutDao {
 
     @Transaction
     @Query("SELECT * FROM workouts")
-    suspend fun getWorkoutWithExercises(): List<RoomWorkoutWithTimersExercisesAndApproaches>?
+    suspend fun getWorkoutWithExercises(): List<RoomWorkoutWithTimersExercisesAndSets>?
 
     @Transaction
     @Query("SELECT * FROM workouts WHERE id = :id")
-    suspend fun getOneById(id: Long): RoomWorkoutWithTimersExercisesAndApproaches?
+    suspend fun getOneById(id: Long): RoomWorkoutWithTimersExercisesAndSets?
 
     @Query("SELECT EXISTS(SELECT * FROM workouts WHERE id LIKE :id)")
     suspend fun isExist(id: Long): Boolean
