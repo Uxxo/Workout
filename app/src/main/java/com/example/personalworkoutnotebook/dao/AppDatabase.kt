@@ -8,7 +8,7 @@ import com.example.personalworkoutnotebook.model.*
     entities = [
         RoomWorkout::class,
         RoomExercise::class,
-        RoomApproach::class,
+        RoomSet::class,
         RoomTimer::class,
         RoomBioParameter::class,
         RoomBioParameterValue::class],
@@ -18,7 +18,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun workoutDao(): WorkoutDao
     abstract fun exerciseDao(): ExerciseDao
-    abstract fun approachDao(): ApproachDao
+    abstract fun setDao(): SetDao
     abstract fun timerDao(): TimerDao
     abstract fun bioParameterDao(): BioParameterDao
     abstract fun bioParameterValueDao(): BioParameterValueDao

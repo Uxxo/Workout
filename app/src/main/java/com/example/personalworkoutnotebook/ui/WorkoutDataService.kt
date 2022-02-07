@@ -2,7 +2,7 @@ package com.example.personalworkoutnotebook.ui
 
 import com.example.personalworkoutnotebook.extension.toText
 import com.example.personalworkoutnotebook.model.*
-import kotlin.math.max
+import com.example.personalworkoutnotebook.model.Set
 
 class WorkoutDataService {
 
@@ -67,26 +67,26 @@ class WorkoutDataService {
 
         exercises.forEach {
             val title = "${it.name}:"
-            val approachesAsString = approachesAsString(it.approaches)
+            val setsAsString = setsAsString(it.sets)
             val notes = if (it.notes != null) {
                 "\n${it.notes}"
             } else {
                 ""
             }
 
-            resultString += "\n$title" + approachesAsString + notes
+            resultString += "\n$title" + setsAsString + notes
         }
         return resultString
     }
 
-    private fun approachesAsString(approaches: List<Approach>): String {
+    private fun setsAsString(sets: List<Set>): String {
         var resultString = ""
 
-        approaches.forEach {
-            val index = approaches.indexOf(it)
+        sets.forEach {
+            val index = sets.indexOf(it)
             var mass = ""
             if (index == 0) mass = "\n" + wholeOrNot(it.mass) + ":"
-            if (index > 0 && it.mass != approaches[index - 1].mass && it.mass != 0.0) {
+            if (index > 0 && it.mass != sets[index - 1].mass && it.mass != 0.0) {
                 mass = "\n" + wholeOrNot(it.mass) + ":"
             }
             val repeat = if (it.repeat != 0) {
@@ -120,18 +120,18 @@ class WorkoutDataService {
         return  uniqueExercises
     }
 
-    fun getMaxApproachesInfoForGraphic(exerciseList: List<Exercise>): List<Double>{
+    fun getMaxSetsInfoForGraphic(exerciseList: List<Exercise>): List<Double>{
         val resultList = mutableListOf<Double>()
         exerciseList.forEach { exercise ->
-            val maxMass = getMaxApproachMass(exercise.approaches)
+            val maxMass = getMaxSetMass(exercise.sets)
             if (maxMass != NOT_VALID_MASS) resultList.add(maxMass)
         }
         return resultList
     }
-    private fun getMaxApproachMass(approaches: List<Approach>):Double{
+    private fun getMaxSetMass(sets: List<Set>):Double{
         var maxMass: Double = NOT_VALID_MASS
-        approaches.forEach { approach ->
-            if(approach.mass > maxMass && approach.repeat > 0) maxMass = approach.mass
+        sets.forEach { set ->
+            if(set.mass > maxMass && set.repeat > 0) maxMass = set.mass
         }
         return  maxMass
 

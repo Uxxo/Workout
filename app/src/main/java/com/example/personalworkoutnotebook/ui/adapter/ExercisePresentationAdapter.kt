@@ -4,10 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.personalworkoutnotebook.databinding.ItemExercisePresentationBinding
-import com.example.personalworkoutnotebook.model.Approach
+import com.example.personalworkoutnotebook.model.Set
 import com.example.personalworkoutnotebook.model.Exercise
-import com.example.personalworkoutnotebook.ui.ViewEvent
-import com.example.personalworkoutnotebook.ui.WorkoutDataService
 
 class ExercisePresentationAdapter(
     private var exerciseList: MutableList<Exercise>,
@@ -46,21 +44,21 @@ class ExercisePresentationAdapter(
         fun bind(exercise: Exercise) {
             exerciseBinding.exerciseTitle.text = exercise.name
 
-            val approachFields: String = approachesAsString(exercise.approaches)
-            exerciseBinding.approachesInf.text = approachFields
+            val setFields: String = setsAsString(exercise.sets)
+            exerciseBinding.setsInf.text = setFields
         }
 
     }
 }
 
-private fun approachesAsString(approaches: List<Approach>): String{
+private fun setsAsString(sets: List<Set>): String{
     var resultString = ""
 
-    approaches.forEach {
-        val index = approaches.indexOf(it)
+    sets.forEach {
+        val index = sets.indexOf(it)
         var mass = ""
         if (index == 0) mass = wholeOrNot(it.mass) + ":"
-        if(index > 0 && it.mass != approaches[index-1].mass && it.mass !=0.0) {
+        if(index > 0 && it.mass != sets[index-1].mass && it.mass !=0.0) {
             mass = "\n" + wholeOrNot(it.mass) + ":"
         }
         val repeat = if(it.repeat !=0) {" /${it.repeat}"}

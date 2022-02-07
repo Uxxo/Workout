@@ -14,16 +14,16 @@
             android:orientation="vertical">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/approachMassLayout"
+            android:id="@+id/set_mass_layout"
             style="@style/Input"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/approach_mass"
+            android:hint="@string/set_mass"
 
             >
 
             <EditText
-                android:id="@+id/approachMassEditText"
+                android:id="@+id/setMassEditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
@@ -35,15 +35,15 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/approachRepeatsLayout"
+            android:id="@+id/set_repeats_layout"
             style="@style/Input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/approach_repeats"
+            android:hint="@string/set_repeats"
             >
 
             <EditText
-                android:id="@+id/approachRepeatsEditText"
+                android:id="@+id/setRepeatsEditText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="numberSigned"
