@@ -12,13 +12,13 @@ class WorkoutDataService {
         val groupMap: MutableMap<String, MutableMap<String, Exercise>> = mutableMapOf()
 
         exerciseList.forEach { exercise ->
-            if(exercise != null){
+            if(exercise?.name != null){
                val incomingExercise = if(exercise.group == null) exercise.copy(group = "Other")
                                     else exercise
                 if (groupMap.containsKey(incomingExercise.group?.trim())) {
                     val exerciseMap = groupMap[incomingExercise.group?.trim()]
                     if (exerciseMap != null) {
-                        if (exerciseMap.containsKey(incomingExercise.name.trim())) {
+                        if (exerciseMap.containsKey(incomingExercise.name!!.trim())) {
                             val checkingExercise = exerciseMap[incomingExercise.name.trim()]
                             if (checkingExercise != null) {
                                 if (incomingExercise.getMaxMass() > checkingExercise.getMaxMass())
@@ -30,7 +30,7 @@ class WorkoutDataService {
                     }
                 } else {
                     val exerciseMap: MutableMap<String, Exercise> =
-                        mutableMapOf(incomingExercise.name.trim() to incomingExercise)
+                        mutableMapOf(incomingExercise.name!!.trim() to incomingExercise)
                     groupMap[incomingExercise.group!!.trim()] = exerciseMap
                 }
             }

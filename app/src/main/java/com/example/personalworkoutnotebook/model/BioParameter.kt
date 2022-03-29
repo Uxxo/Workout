@@ -3,7 +3,6 @@ package com.example.personalworkoutnotebook.model
 import androidx.room.*
 import com.example.personalworkoutnotebook.extension.toFirstUpperCase
 import java.io.Serializable
-import java.util.*
 
 data class BioParameter(
     val id: Long,

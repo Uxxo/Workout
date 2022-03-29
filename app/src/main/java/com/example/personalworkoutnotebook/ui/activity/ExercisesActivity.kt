@@ -26,28 +26,17 @@ class ExercisesActivity : AppCompatActivity() {
         binding = ActivityExercisesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.groupRecycler.adapter = GroupAdapter(this,mutableListOf())
+        val groupAdapter = GroupAdapter(this)
         { event ->
             when(event){
                 is ViewEvent.StartExerciseInfoActivity -> startActivity(event.intent)
             }
         }
 
-
+        binding.groupRecycler.adapter = groupAdapter
 
         workoutViewModel.groups.observe(this){ groups ->
-
-            val adapter = GroupAdapter(this,
-                if (groups.isNotEmpty()) {groups as MutableList<Group>}
-                else mutableListOf()
-            ) { event ->
-                when (event) {
-                    is ViewEvent.StartExerciseInfoActivity -> startActivity(event.intent)
-                }
-            }
-
-            binding.groupRecycler.adapter = adapter
-            adapter.notifyDataSetChanged()
+            groupAdapter.setGroupList(groups)
         }
 
         binding.myExercises.drawable.setTint(Color.BLUE)

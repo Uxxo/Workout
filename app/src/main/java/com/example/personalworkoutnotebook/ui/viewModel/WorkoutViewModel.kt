@@ -18,6 +18,7 @@ import com.example.personalworkoutnotebook.repository.WorkoutTimerRepository
 import com.example.personalworkoutnotebook.repository.WorkoutRepository
 import com.example.personalworkoutnotebook.ui.WorkoutDataService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import java.util.*
 import javax.inject.Inject
 
@@ -32,7 +33,6 @@ class WorkoutViewModel @Inject constructor(
 
 //    private val dbFactory: DBFactory
 ) : ViewModel() {
-
 
     private var allExercise: List<Exercise?> = listOf()
 
@@ -68,8 +68,8 @@ class WorkoutViewModel @Inject constructor(
         get() = _uniqueExercises
 
 
-    suspend fun loadWorkoutById(id: Long) {
-        _workout.value = workoutRepository.getById(id)
+    suspend fun updateWorkoutValue(workoutId: Long) {
+        _workout.value = workoutRepository.getById(workoutId)
     }
 
 
@@ -86,6 +86,11 @@ class WorkoutViewModel @Inject constructor(
 
     suspend fun saveWorkout(newWorkout: Workout) {
         workoutRepository.save(newWorkout)
+    }
+
+    suspend fun updateWorkout(newWorkout: Workout){
+        saveWorkout(newWorkout)
+        updateWorkoutValue(newWorkout.id)
     }
 
     suspend fun createWorkout(): Workout {
@@ -105,6 +110,7 @@ class WorkoutViewModel @Inject constructor(
         val newWorkout = createWorkout()
         val editedWorkout = workout.copy(id = newWorkout.id, exercises = mutableListOf(),
                                         date = newWorkout.date, status = newWorkout.status)
+
         saveWorkout(editedWorkout)
 
         val originExercises = workout.exercises
@@ -149,6 +155,7 @@ class WorkoutViewModel @Inject constructor(
 
     suspend fun saveTimer(timer : WorkoutTimer){
         timerRepository.save(timer)
+        updateWorkoutValue(timer.workoutId)
     }
 
     private suspend fun loadAllExercises():List<Exercise?> {
@@ -156,7 +163,7 @@ class WorkoutViewModel @Inject constructor(
         return allExercise
     }
 
-    suspend fun loadUniqueExercises(){
+    suspend fun getUniqueExercises(){
         val exercises = loadAllExercises()
         val uniqueExercises = WorkoutDataService().getUniqueExercisesWithMaxMass(exercises)
         _uniqueExercises.value = uniqueExercises
@@ -166,9 +173,9 @@ class WorkoutViewModel @Inject constructor(
         return Exercise(
             id = 0L,
             workoutId = workoutId,
-            name = "",
+            name = null,
             notes = null,
-            group = ""
+            group = null
         )
     }
 
@@ -177,17 +184,10 @@ class WorkoutViewModel @Inject constructor(
         val newExercise = createNewExercise(workoutId)
 
         val savedExercise = exerciseRepository.save(newExercise)
-        val setsList = mutableListOf<Set>()
         for (i in 1..4) {
-            val savedSet = setRepository.save(createNewSet(savedExercise.id))
-            setsList.add(savedSet)
+            setRepository.save(createNewSet(savedExercise.id))
         }
-        val updatedExercise = savedExercise.copy(sets = setsList)
-
-        exerciseRepository.save(updatedExercise)
-
-        val workout = workoutRepository.getById(workoutId) ?: return
-        _workout.value = workout
+        updateWorkoutValue(workoutId)
     }
 
     suspend fun deleteExercise(exerciseId: Long) {
@@ -196,9 +196,7 @@ class WorkoutViewModel @Inject constructor(
         val exerciseForDelete = exerciseRepository.getById(exerciseId) ?: return
         exerciseRepository.delete(exerciseForDelete)
 
-        val updatedWorkout = workoutRepository.getById(exerciseForDelete.workoutId) ?: return
-
-        _workout.value = updatedWorkout
+        updateWorkoutValue(exerciseForDelete.workoutId)
 
         _isLoading.postValue(false)
     }
@@ -213,6 +211,7 @@ class WorkoutViewModel @Inject constructor(
 
     suspend fun loadExercisesDataForGraphic(id: Long){
         val exercise = exerciseRepository.getById(id) ?: return
+        if(exercise.name == null) return
         val exerciseList = if (exercise.group != null) {
             exerciseRepository.getExerciseByName(exercise.name, exercise.group)
         } else {
@@ -233,8 +232,7 @@ class WorkoutViewModel @Inject constructor(
         _isLoading.postValue(true)
         setRepository.save(createNewSet(exerciseId))
         val updatedExercise = exerciseRepository.getById(exerciseId) ?: return
-        val updatedWorkout = workoutRepository.getById(updatedExercise.workoutId) ?: return
-        _workout.value = updatedWorkout
+        updateWorkoutValue(updatedExercise.workoutId)
         _isLoading.postValue(false)
     }
 

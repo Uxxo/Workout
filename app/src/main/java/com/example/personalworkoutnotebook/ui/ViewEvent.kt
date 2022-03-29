@@ -15,6 +15,7 @@ sealed class ViewEvent {
     data class DeleteWorkout(val workout: Workout) : ViewEvent()
     data class CopyWorkoutsFields(val workout: Workout) : ViewEvent()
     data class DuplicateWorkout(val workout: Workout) : ViewEvent()
+    data class UpdateWorkoutData(val workoutId: Long ): ViewEvent()
 
     data class StartExerciseInfoActivity(val intent: Intent) : ViewEvent()
 

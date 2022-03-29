@@ -1,10 +1,11 @@
 package com.example.personalworkoutnotebook.dao
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
+import androidx.room.*
+import androidx.room.migration.AutoMigrationSpec
 import com.example.personalworkoutnotebook.model.*
 
 @Database(
+    version = 1,
     entities = [
         RoomWorkout::class,
         RoomExercise::class,
@@ -12,8 +13,8 @@ import com.example.personalworkoutnotebook.model.*
         RoomTimer::class,
         RoomBioParameter::class,
         RoomBioParameterValue::class],
-    version = 1
 )
+
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun workoutDao(): WorkoutDao

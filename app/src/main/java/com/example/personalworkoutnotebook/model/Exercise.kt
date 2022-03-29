@@ -6,7 +6,7 @@ import com.example.personalworkoutnotebook.extension.toFirstUpperCase
 data class Exercise(
     val id: Long = 0L,
     val workoutId: Long,
-    val name: String,
+    val name: String?,
     val notes: String?,
     val group: String?,
     val sets: List<Set> = listOf()
@@ -34,10 +34,9 @@ data class RoomExerciseWithSet(
 
 fun Exercise.toRoom() = RoomExercise(
     id = this.id,
-    name = this.name.toFirstUpperCase(),
+    name = this.name?.toFirstUpperCase() ?: "",
     notes = this.notes,
-    group = if (this.group != null) this.group.toFirstUpperCase()
-            else null,
+    group = this.group?.toFirstUpperCase(),
     workoutId = this.workoutId
 )
 

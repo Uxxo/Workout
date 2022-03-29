@@ -1,7 +1,6 @@
 package com.example.personalworkoutnotebook.repository
 
 import com.example.personalworkoutnotebook.dao.WorkoutDao
-import com.example.personalworkoutnotebook.extension.toFirstUpperCase
 import com.example.personalworkoutnotebook.model.Workout
 import com.example.personalworkoutnotebook.model.toModel
 import com.example.personalworkoutnotebook.model.toRoom

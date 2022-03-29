@@ -36,7 +36,6 @@
                 android:layout_height="match_parent"
                 android:padding="7dp"
                 android:singleLine="false"
-                android:text="@={exercise.name}"
                 tools:text="Name" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -59,7 +58,6 @@
                 android:layout_height="match_parent"
                 android:padding="7dp"
                 android:singleLine="true"
-                android:text="@={exercise.group}"
                 tools:text="Group"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -117,12 +115,12 @@
             app:layout_constraintEnd_toStartOf="@id/deleteExercise"
             app:layout_constraintTop_toBottomOf="@id/setRecycler"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:visibility="gone">
+            >
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/exerciseNoteEditText"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="@={exercise.note}"
                 tools:text="Notes"/>
 
@@ -161,11 +159,9 @@
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             app:tint="#424242"
-            app:layout_constraintStart_toStartOf="@id/addSet"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/setRecycler"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:elevation="2dp"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
