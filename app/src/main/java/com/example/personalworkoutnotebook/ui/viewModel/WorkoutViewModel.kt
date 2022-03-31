@@ -18,7 +18,6 @@ import com.example.personalworkoutnotebook.repository.WorkoutTimerRepository
 import com.example.personalworkoutnotebook.repository.WorkoutRepository
 import com.example.personalworkoutnotebook.ui.WorkoutDataService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import java.util.*
 import javax.inject.Inject
 
@@ -73,9 +72,9 @@ class WorkoutViewModel @Inject constructor(
     }
 
 
-    suspend fun loadData() {
+    suspend fun loadAllWorkouts() {
         _isLoading.postValue(true)
-        _workouts.value = workoutRepository.getAll().sortedBy { it.date.timeInMillis }
+        _workouts.value = workoutRepository.getAll()
         _isLoading.postValue(false)
 
     }
@@ -121,7 +120,7 @@ class WorkoutViewModel @Inject constructor(
                saveSet(set.copy(id = 0, exerciseId = newExerciseId, repeat = 0 ))
             }
         }
-        loadData()
+        loadAllWorkouts()
     }
 
     suspend fun deleteWorkout(workout: Workout) {
@@ -130,7 +129,7 @@ class WorkoutViewModel @Inject constructor(
 
         workoutRepository.delete(workout)
 
-        loadData()
+        loadAllWorkouts()
         _isLoading.postValue(false)
     }
 
@@ -246,9 +245,9 @@ class WorkoutViewModel @Inject constructor(
         Toast.makeText( context,"Workout copied to buffer", Toast.LENGTH_SHORT).show()
     }
 
-    suspend fun loadAllExercisesGroup(){
+    suspend fun loadAllExercisesGroup(context: Context){
         val exercises = exerciseRepository.getAll()
-        _groups.value = WorkoutDataService().getGroupList(exercises)
+        _groups.value = WorkoutDataService().getGroupList(context,exercises)
     }
 
 }

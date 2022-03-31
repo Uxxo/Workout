@@ -4,11 +4,13 @@
     <string name="exercise_title_helper">Name the exercise</string>
     <string name="set_mass">Kg</string>
     <string name="set_repeats">Rp</string>
+    <string name="exercise_name_hint">Exercise Name</string>
     <string name="exercise_note_hint">Notes</string>
     <string name="exercise_note_helper">Notes for the Exercise</string>
     <string name="new_workout_title">New workout</string>
     <string name="exercise_title">New exercise</string>
     <string name="exercise_group_hint">Group</string>
+    <string name="group_other">Other</string>
     <string name="start_new_workout">Start new Workout</string>
     <string name="start_new_exercise">Add exercise</string>
     <string name="timer_2">Timer 2</string>
@@ -16,7 +18,7 @@
     <string name="set_time">Set time</string>
     <string name="timer_clear">0:00</string>
     <string name="ok">OK</string>
-    <string name="cancel">CANCEL</string>
+    <string name="cancel">Cancel</string>
     <string name="add_notes">Add Notes</string>
     <string name="add_value">Add Value</string>
     <string name="edit_parameters">Edit Parameters</string>
@@ -29,5 +31,7 @@
     <string name="this_exercise_will_be_permanently_deleted">This exercise will be permanently deleted</string>
     <string name="this_bio_parameter_will_be_permanently_deleted">This bio parameter will be permanently deleted</string>
     <string name="this_value_will_be_permanently_deleted">This value will be permanently deleted</string>
+
+
 
 </resources>

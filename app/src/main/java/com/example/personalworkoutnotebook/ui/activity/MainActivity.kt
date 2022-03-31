@@ -9,7 +9,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.personalworkoutnotebook.databinding.ActivityMainBinding
-import com.example.personalworkoutnotebook.model.Workout
 import com.example.personalworkoutnotebook.ui.ViewEvent
 import com.example.personalworkoutnotebook.ui.adapter.WorkoutPresentationAdapter
 import com.example.personalworkoutnotebook.ui.viewModel.WorkoutViewModel
@@ -44,9 +43,7 @@ class MainActivity : AppCompatActivity() {
 
 
         workoutViewModel.workouts.observe(this) { workouts ->
-              if(workouts.isNotEmpty()){
-                  workoutAdapter.setData(workouts.sortedByDescending { it.date })
-              }
+            workoutAdapter.setData(workouts)
         }
 
         binding.startNewWorkout.setOnClickListener {
@@ -81,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             if (id == -1L) return
             val adapter = (binding.workoutRecycler.adapter as WorkoutPresentationAdapter)
             lifecycleScope.launch {
-                workoutViewModel.loadData()
+                workoutViewModel.loadAllWorkouts()
                 adapter.notifyDataSetChanged()
             }
 
@@ -95,7 +92,7 @@ class MainActivity : AppCompatActivity() {
 //        }
         super.onStart()
         lifecycleScope.launch {
-            workoutViewModel.loadData()
+            workoutViewModel.loadAllWorkouts()
         }
     }
 

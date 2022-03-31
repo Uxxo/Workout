@@ -54,7 +54,7 @@ class ExercisesActivity : AppCompatActivity() {
         super.onStart()
 
         lifecycleScope.launch {
-            workoutViewModel.loadAllExercisesGroup()
+            workoutViewModel.loadAllExercisesGroup(this@ExercisesActivity)
         }
 
     }

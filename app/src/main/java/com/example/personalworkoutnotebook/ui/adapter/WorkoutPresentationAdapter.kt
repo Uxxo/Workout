@@ -24,7 +24,12 @@ class WorkoutPresentationAdapter(
     private var workoutList = mutableListOf<Workout>()
 
     fun setData(incomingWorkoutList: List<Workout>){
-        workoutList = incomingWorkoutList as MutableList<Workout>
+        if (incomingWorkoutList.isNotEmpty()){
+            workoutList = incomingWorkoutList.sortedByDescending { it.date } as MutableList<Workout>
+        }
+        else {
+            workoutList.clear()
+        }
         notifyDataSetChanged()
     }
 

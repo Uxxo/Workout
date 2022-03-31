@@ -1,29 +1,38 @@
 package com.example.personalworkoutnotebook.ui
 
+import android.content.Context
+import com.example.personalworkoutnotebook.R
 import com.example.personalworkoutnotebook.extension.toText
 import com.example.personalworkoutnotebook.model.*
 import com.example.personalworkoutnotebook.model.Set
 
 class WorkoutDataService {
 
-    fun getGroupList(exerciseList: List<Exercise?>): List<Group> {
-
+    fun getGroupList(context: Context, exerciseList: List<Exercise?>): List<Group> {
 
         val groupMap: MutableMap<String, MutableMap<String, Exercise>> = mutableMapOf()
 
         exerciseList.forEach { exercise ->
-            if(exercise?.name != null){
-               val incomingExercise = if(exercise.group == null) exercise.copy(group = "Other")
-                                    else exercise
+            if (exercise?.name != null) {
+                val incomingExercise =
+                    if (exercise.group == null) exercise.copy(group = context.getString(R.string.group_other))
+                    else exercise
                 if (groupMap.containsKey(incomingExercise.group?.trim())) {
                     val exerciseMap = groupMap[incomingExercise.group?.trim()]
                     if (exerciseMap != null) {
                         if (exerciseMap.containsKey(incomingExercise.name!!.trim())) {
                             val checkingExercise = exerciseMap[incomingExercise.name.trim()]
                             if (checkingExercise != null) {
-                                if (incomingExercise.getMaxMass() > checkingExercise.getMaxMass())
+                                if (incomingExercise.getMaxMass() > checkingExercise.getMaxMass()) {
                                     exerciseMap += incomingExercise.name.trim() to incomingExercise
-                                groupMap += incomingExercise.group!!.trim() to exerciseMap
+                                    groupMap += incomingExercise.group!!.trim() to exerciseMap
+                                }
+                                if (incomingExercise.getMaxMass() == checkingExercise.getMaxMass() &&
+                                    incomingExercise.getMaxRepeat(incomingExercise.getMaxMass()) > checkingExercise.getMaxRepeat(incomingExercise.getMaxMass())
+                                ) {
+                                    exerciseMap += incomingExercise.name.trim() to incomingExercise
+                                    groupMap += incomingExercise.group!!.trim() to exerciseMap
+                                }
                             }
                         } else exerciseMap[incomingExercise.name.trim()] = incomingExercise
 
@@ -46,7 +55,6 @@ class WorkoutDataService {
             val group = Group(it.key, exercisePresentationList)
             groupList.add(group)
         }
-
 
 
         return groupList
@@ -105,22 +113,25 @@ class WorkoutDataService {
         } else value.toString()
     }
 
-    fun getUniqueExercisesWithMaxMass(exerciseList: List<Exercise?>): List<Exercise>{
+    fun getUniqueExercisesWithMaxMass(exerciseList: List<Exercise?>): List<Exercise> {
         val uniqueExercises = mutableListOf<Exercise>()
         exerciseList.forEach { exercise ->
-            if(exercise !=null){
-                if(uniqueExercises.any { it.name == exercise.name && it.group == exercise.group }){
-                        val index = uniqueExercises.indexOfFirst { it.name == exercise.name && it.group == exercise.group }
-                    if(uniqueExercises[index].getMaxMass() < exercise.getMaxMass()){
+            if (exercise != null && exercise.name !=null) {
+                if (uniqueExercises.any { it.name == exercise.name && it.group == exercise.group }) {
+                    val index =
+                        uniqueExercises.indexOfFirst { it.name == exercise.name && it.group == exercise.group }
+                    if (uniqueExercises[index].getMaxMass() < exercise.getMaxMass()) {
                         uniqueExercises[index] = exercise
                     }
-                } else {uniqueExercises.add(exercise)}
+                } else {
+                    uniqueExercises.add(exercise)
+                }
             }
         }
-        return  uniqueExercises
+        return uniqueExercises
     }
 
-    fun getMaxSetsInfoForGraphic(exerciseList: List<Exercise>): List<Double>{
+    fun getMaxSetsInfoForGraphic(exerciseList: List<Exercise>): List<Double> {
         val resultList = mutableListOf<Double>()
         exerciseList.forEach { exercise ->
             val maxMass = getMaxSetMass(exercise.sets)
@@ -128,16 +139,17 @@ class WorkoutDataService {
         }
         return resultList
     }
-    private fun getMaxSetMass(sets: List<Set>):Double{
+
+    private fun getMaxSetMass(sets: List<Set>): Double {
         var maxMass: Double = NOT_VALID_MASS
         sets.forEach { set ->
-            if(set.mass > maxMass && set.repeat > 0) maxMass = set.mass
+            if (set.mass > maxMass && set.repeat > 0) maxMass = set.mass
         }
-        return  maxMass
+        return maxMass
 
     }
 
-    companion object{
+    companion object {
         private const val NOT_VALID_MASS = -1000.0
     }
 }

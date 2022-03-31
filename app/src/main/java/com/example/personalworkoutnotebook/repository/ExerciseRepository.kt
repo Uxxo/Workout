@@ -53,7 +53,7 @@ class ExerciseRepository @Inject constructor(
     }
 
     suspend fun save(exercise: Exercise): Exercise {
-
+        println()
         return withContext(Dispatchers.IO) {
             if (exerciseDao.getOneById(exercise.id) != null) {
                 exerciseDao.update(exercise.toRoom())

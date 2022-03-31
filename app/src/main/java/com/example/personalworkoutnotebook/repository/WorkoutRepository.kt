@@ -13,13 +13,11 @@ class WorkoutRepository @Inject constructor(
 ) {
 
     suspend fun getAll(): List<Workout> {
-        return withContext(Dispatchers.IO) {
-            val workoutList: MutableList<Workout> = mutableListOf()
+        val workoutList: MutableList<Workout> = mutableListOf()
             workoutDao.getWorkoutWithExercises()?.forEach { roomWorkoutWithExercises ->
                 workoutList.add(roomWorkoutWithExercises.toModel())
             }
-            workoutList
-        }
+            return workoutList
     }
 
     suspend fun getById(id: Long): Workout? {

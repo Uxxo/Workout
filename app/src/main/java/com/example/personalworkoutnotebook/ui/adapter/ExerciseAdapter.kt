@@ -42,6 +42,7 @@ class ExerciseAdapter(
 
     fun setUniqueExercises(incomingExercises: List<Exercise>){
         uniqueExercisesList = incomingExercises as MutableList<Exercise>
+        notifyDataSetChanged()
     }
 
     fun setWorkoutStatus(incomingStatus: Int){
@@ -132,7 +133,6 @@ class ExerciseAdapter(
             autoCompleteTextView.threshold = 2
             autoCompleteTextView.onItemClickListener =
                 AdapterView.OnItemClickListener { parent, _, position, _ ->
-
                     val selectedItem = parent.getItemAtPosition(position).toString()
                     val foundExercise = exercisesMap[selectedItem]
                     if (foundExercise != null) {
@@ -189,13 +189,15 @@ class ExerciseAdapter(
             }
 
             if(exercise.group != null && exerciseBinding.exerciseGroup.editText?.toString() != exercise.group) {
+                println()
                 exerciseBinding.exerciseGroup.editText?.setText(exercise.group)
             }
             exerciseBinding.exerciseGroup.editText?.afterTextChanged { text ->
                 if (!onBind) {
 
                     val index = exerciseBinding.root.tag as Int
-                    val editedExercise = exerciseList[index].copy(group = text)
+                    val editedExercise = if (text != "") exerciseList[index].copy(group = text)
+                                         else exerciseList[index].copy(group = null)
                     callback.invoke(ViewEvent.SaveExercise(editedExercise))
 
                     exerciseList.removeAt(index)
@@ -322,7 +324,7 @@ class ExerciseAdapter(
         val resultList = mutableListOf<String>()
         exercises.forEach { exercise ->
             if (exercise.name != null) {
-                val outputString = "${exercise.name} (${exercise.group})"
+                val outputString = "${exercise.name} (${exercise.group ?: context.getString(R.string.group_other)})"
                 resultList.add(exercises.indexOf(exercise), outputString)
                 exercisesMap[outputString] = exercise
             }

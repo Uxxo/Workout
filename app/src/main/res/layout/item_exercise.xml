@@ -36,6 +36,7 @@
                 android:layout_height="match_parent"
                 android:padding="7dp"
                 android:singleLine="false"
+                android:hint="@string/exercise_name_hint"
                 tools:text="Name" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -58,6 +59,7 @@
                 android:layout_height="match_parent"
                 android:padding="7dp"
                 android:singleLine="true"
+                android:hint="@string/exercise_group_hint"
                 tools:text="Group"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -121,7 +123,6 @@
                 android:id="@+id/exerciseNoteEditText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@={exercise.note}"
                 tools:text="Notes"/>
 
         </com.google.android.material.textfield.TextInputLayout>
