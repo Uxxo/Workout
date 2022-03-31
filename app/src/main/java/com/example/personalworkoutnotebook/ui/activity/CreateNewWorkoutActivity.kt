@@ -86,7 +86,6 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                 is ViewEvent.SaveExercise -> lifecycleScope.launch { workoutViewModel.saveExercise(event.exercise) }
                 is ViewEvent.DeleteExercise -> lifecycleScope.launch { workoutViewModel.deleteExercise(event.exercise.id) }
                 is ViewEvent.AddSetToExercise -> lifecycleScope.launch { workoutViewModel.addSetToExercise(event.exercise.id) }
-//                is ViewEvent.UpdateWorkoutData -> lifecycleScope.launch { workoutViewModel.updateWorkoutValue(event.workoutId) }
             }
         }
 
@@ -118,7 +117,6 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                         workoutViewModel.saveWorkout(editedWorkout)
                         workoutName = it
                     }
-//                    workout = editedWorkout
 
             }
 
@@ -164,7 +162,8 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                     Workout.IN_PROCESS ->{
                         val editedWorkout = workout.copy(status = Workout.FINISHED, name = workoutName)
                         lifecycleScope.launch {
-                            workoutViewModel.updateWorkout(editedWorkout)
+                            workoutViewModel.saveWorkout(editedWorkout)
+                            workoutViewModel.loadAllWorkouts()
                         }
                         finish()
                     }

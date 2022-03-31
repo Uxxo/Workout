@@ -98,12 +98,9 @@ class ExerciseAdapter(
     inner class ExerciseHolder(private val exerciseBinding: ItemExerciseBinding) :
         RecyclerView.ViewHolder(exerciseBinding.root) {
 
-        private lateinit var setRecycler: RecyclerView
-
         fun bind(exercise: Exercise) {
 
             val setAdapter = SetAdapter(callback)
-            setAdapter.setSetList(exercise.sets)
 
             exerciseBinding.root.tag = exerciseList.indexOf(exercise)
             exerciseBinding.deleteExercise.setOnClickListener {
@@ -128,7 +125,6 @@ class ExerciseAdapter(
             val namesList = getExercisesTitleAndGroup(uniqueExercisesList)
             val uniqueExercisesAdapter =
                 ArrayAdapter(context, R.layout.support_simple_spinner_dropdown_item, namesList)
-
             autoCompleteTextView.setAdapter(uniqueExercisesAdapter)
             autoCompleteTextView.threshold = 2
             autoCompleteTextView.onItemClickListener =
@@ -153,6 +149,7 @@ class ExerciseAdapter(
                             if (exerciseBinding.setRecycler.visibility == View.VISIBLE) {
 
                                 setAdapter.setSetList(editedExercise.sets)
+                                exerciseBinding.setRecycler.smoothScrollToPosition(setAdapter.itemCount -1)
                             }
                             exerciseBinding.exerciseGroup.visibility = View.VISIBLE
                         }
@@ -182,12 +179,6 @@ class ExerciseAdapter(
                 }
             }
 
-            exerciseBinding.exerciseName.setOnFocusChangeListener { _, hasFocus ->
-                if (!hasFocus) {
-                    if (!onBind) notifyDataSetChanged()
-                }
-            }
-
             if(exercise.group != null && exerciseBinding.exerciseGroup.editText?.toString() != exercise.group) {
                 println()
                 exerciseBinding.exerciseGroup.editText?.setText(exercise.group)
@@ -205,13 +196,10 @@ class ExerciseAdapter(
                 }
             }
 
-            exerciseBinding.exerciseGroup.setOnFocusChangeListener { _, hasFocus ->
-                if (!hasFocus) notifyDataSetChanged()
-            }
-
             if (workoutStatus == Workout.IN_PROCESS) {
                 exerciseBinding.setRecycler.adapter = setAdapter
                 setAdapter.setSetList(exercise.sets)
+                exerciseBinding.setRecycler.smoothScrollToPosition(exercise.sets.size -1)
 
                 exerciseBinding.addSet.setOnClickListener {
                     callback.invoke(ViewEvent.AddSetToExercise(exercise))
@@ -221,9 +209,6 @@ class ExerciseAdapter(
                     if (exercise.sets.size > 1) {
                         val set = exercise.sets[exercise.sets.size - 1]
                         callback.invoke(ViewEvent.DeleteSet(set))
-                        val newSetsList = exercise.sets as MutableList
-                        newSetsList.remove(set)
-                        setAdapter.setSetList(newSetsList)
                     }
                 }
 
@@ -235,23 +220,14 @@ class ExerciseAdapter(
 
             if (exercise.notes == null || exercise.notes.isEmpty()) {
                 exerciseBinding.addNotesButton.visibility = View.VISIBLE
-                exerciseBinding.addNotesTextView.visibility = View.VISIBLE
                 exerciseBinding.exerciseNote.visibility = View.GONE
             } else {
                 exerciseBinding.exerciseNote.visibility = View.VISIBLE
                 exerciseBinding.addNotesButton.visibility = View.GONE
-                exerciseBinding.addNotesTextView.visibility = View.GONE
             }
 
             exerciseBinding.addNotesButton.setOnClickListener {
                 exerciseBinding.exerciseNote.visibility = View.VISIBLE
-                exerciseBinding.addNotesTextView.visibility = View.GONE
-                it.visibility = View.GONE
-            }
-
-            exerciseBinding.addNotesTextView.setOnClickListener {
-                exerciseBinding.exerciseNote.visibility = View.VISIBLE
-                exerciseBinding.addNotesButton.visibility = View.GONE
                 it.visibility = View.GONE
             }
 
