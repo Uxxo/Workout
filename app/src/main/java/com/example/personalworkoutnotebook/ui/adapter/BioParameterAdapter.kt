@@ -61,10 +61,6 @@ class BioParameterAdapter(
                 itemBinding.bioParameterDate.text = actualValue.date.toText()
             }
 
-//            itemBinding.addValue.setOnClickListener {
-//                val index = itemBinding.root.tag as Int
-//                createSetValueDialog(context,bioParameter,index)
-//            }
 
             itemBinding.addValueButton.setOnClickListener {
                 val index = itemBinding.root.tag as Int

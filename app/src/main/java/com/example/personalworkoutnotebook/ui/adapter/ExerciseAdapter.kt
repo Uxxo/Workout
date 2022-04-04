@@ -37,11 +37,13 @@ class ExerciseAdapter(
 
     fun setExercises(incomingExercises: List<Exercise>) {
         exerciseList = incomingExercises as MutableList<Exercise>
+        println()
         notifyDataSetChanged()
     }
 
     fun setUniqueExercises(incomingExercises: List<Exercise>){
         uniqueExercisesList = incomingExercises as MutableList<Exercise>
+        println()
         notifyDataSetChanged()
     }
 
@@ -121,6 +123,7 @@ class ExerciseAdapter(
                 }
             }
 
+
             val autoCompleteTextView = exerciseBinding.exerciseNameEditText
             val namesList = getExercisesTitleAndGroup(uniqueExercisesList)
             val uniqueExercisesAdapter =
@@ -161,38 +164,44 @@ class ExerciseAdapter(
                 else exerciseBinding.exerciseGroup.visibility = View.VISIBLE
             }
 
-            if (exercise.name != null && exerciseBinding.exerciseName.editText?.text.toString() != exercise.name) {
+
+            if (exercise.name != null) {
                 exerciseBinding.exerciseName.editText?.setText(exercise.name)
+            } else {
+                exerciseBinding.exerciseName.editText?.setText("")
             }
             exerciseBinding.exerciseName.editText?.afterTextChanged { text ->
-                if (!onBind) {
-                    if (text.length > 10) exerciseBinding.exerciseGroup.visibility = View.VISIBLE
-                    val index = exerciseBinding.root.tag as Int
-                    val editedExercise = if(text.isEmpty()) exerciseList[index].copy( name = null)
-                                         else  exerciseList[index].copy(name = text)
-                    callback.invoke(ViewEvent.SaveExercise(editedExercise))
+                if(exerciseBinding.exerciseName.editText?.text.toString() != exercise.name){
+                    if (!onBind) {
+                        if (text.length > 10) exerciseBinding.exerciseGroup.visibility = View.VISIBLE
+                        val index = exerciseBinding.root.tag as Int
+                        val editedExercise = if(text.isEmpty()) exerciseList[index].copy( name = null)
+                        else  exerciseList[index].copy(name = text)
+                        callback.invoke(ViewEvent.SaveExercise(editedExercise))
 
-                    exerciseList.removeAt(index)
-                    exerciseList.add(index, editedExercise)
-
-
+                        exerciseList.removeAt(index)
+                        exerciseList.add(index, editedExercise)
+                    }
                 }
             }
 
-            if(exercise.group != null && exerciseBinding.exerciseGroup.editText?.toString() != exercise.group) {
-                println()
+            if(exercise.group != null ) {
                 exerciseBinding.exerciseGroup.editText?.setText(exercise.group)
+            } else {
+                exerciseBinding.exerciseGroup.editText?.setText("")
             }
+
             exerciseBinding.exerciseGroup.editText?.afterTextChanged { text ->
-                if (!onBind) {
+                if(exerciseBinding.exerciseGroup.editText?.text.toString() != exercise.group) {
+                    if (!onBind) {
+                        val index = exerciseBinding.root.tag as Int
+                        val editedExercise = if (text != "") exerciseList[index].copy(group = text)
+                        else exerciseList[index].copy(group = null)
+                        callback.invoke(ViewEvent.SaveExercise(editedExercise))
 
-                    val index = exerciseBinding.root.tag as Int
-                    val editedExercise = if (text != "") exerciseList[index].copy(group = text)
-                                         else exerciseList[index].copy(group = null)
-                    callback.invoke(ViewEvent.SaveExercise(editedExercise))
-
-                    exerciseList.removeAt(index)
-                    exerciseList.add(index, editedExercise)
+                        exerciseList.removeAt(index)
+                        exerciseList.add(index, editedExercise)
+                    }
                 }
             }
 
