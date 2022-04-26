@@ -1,7 +1,6 @@
 package com.example.personalworkoutnotebook.dao
 
 import androidx.room.*
-import androidx.room.migration.AutoMigrationSpec
 import com.example.personalworkoutnotebook.model.*
 
 @Database(

@@ -54,8 +54,8 @@ class WorkoutViewModel @Inject constructor(
     val exercise:LiveData<Exercise>
         get() = _exercise
 
-    private var _exercisesGraphData = MutableLiveData<List<Double>>()
-    val exerciseGraphData:LiveData<List<Double>>
+    private var _exercisesGraphData = MutableLiveData<Map<Calendar, Double>>()
+    val exerciseGraphData:LiveData<Map<Calendar, Double>>
         get() = _exercisesGraphData
 
     private var _groups = MutableLiveData<List<Group>>()
@@ -216,7 +216,9 @@ class WorkoutViewModel @Inject constructor(
         } else {
             exerciseRepository.getExerciseByName(exercise.name, "")
         }
-        _exercisesGraphData.value = WorkoutDataService().getMaxSetsInfoForGraphic(exerciseList)
+        val allWorkouts = workoutRepository.getAll()
+
+        _exercisesGraphData.value = WorkoutDataService().getExercisesInfoForGraphic(exerciseList, allWorkouts)
     }
 
     suspend fun saveSet(set: Set) {

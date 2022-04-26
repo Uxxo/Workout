@@ -1,5 +1,7 @@
 package com.example.personalworkoutnotebook.ui.adapter
 
+import android.text.InputFilter
+import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -52,7 +54,9 @@ class SetAdapter(
             }
 
 
-            itemBinding.setMassLayout.editText?.afterTextChanged { text ->
+            itemBinding.setMassLayout.editText?.afterTextChanged { it ->
+                val text = it.replace(',', '.', false)
+                println()
                 val index = itemBinding.root.tag as Int
                     val editedSet =
                         if (text.isValidDouble() && text != "-") setList[index].copy(mass = text.toDouble())

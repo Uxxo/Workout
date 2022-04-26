@@ -26,7 +26,7 @@
                 android:id="@+id/setMassEditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="numberSigned"
+                android:inputType="number"
                 android:digits="0123456789.-"
                 android:singleLine="true"
                 android:gravity="center"

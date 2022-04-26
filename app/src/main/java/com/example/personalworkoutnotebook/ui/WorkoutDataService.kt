@@ -5,6 +5,7 @@ import com.example.personalworkoutnotebook.R
 import com.example.personalworkoutnotebook.extension.toText
 import com.example.personalworkoutnotebook.model.*
 import com.example.personalworkoutnotebook.model.Set
+import java.util.*
 
 class WorkoutDataService {
 
@@ -131,13 +132,17 @@ class WorkoutDataService {
         return uniqueExercises
     }
 
-    fun getMaxSetsInfoForGraphic(exerciseList: List<Exercise>): List<Double> {
-        val resultList = mutableListOf<Double>()
+    fun getExercisesInfoForGraphic(exerciseList: List<Exercise>, workoutList: List<Workout>): Map<Calendar, Double> {
+        val resultMap = mutableMapOf<Calendar, Double>()
         exerciseList.forEach { exercise ->
-            val maxMass = getMaxSetMass(exercise.sets)
-            if (maxMass != NOT_VALID_MASS) resultList.add(maxMass)
+            workoutList.forEach { workout ->
+                if(workout.exercises.contains(exercise)){
+                    resultMap[workout.date] = exercise.getMaxMass()
+                }
+            }
+
         }
-        return resultList
+        return resultMap
     }
 
     private fun getMaxSetMass(sets: List<Set>): Double {

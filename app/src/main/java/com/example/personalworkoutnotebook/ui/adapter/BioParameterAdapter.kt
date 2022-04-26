@@ -16,10 +16,15 @@ import com.example.personalworkoutnotebook.extension.toText
 import com.example.personalworkoutnotebook.model.BioParameter
 import com.example.personalworkoutnotebook.model.BioParameterValue
 import com.example.personalworkoutnotebook.ui.ViewEvent
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import java.util.*
+import kotlin.collections.ArrayList
 
 class BioParameterAdapter(
     private val bioParametersList: MutableList<BioParameter>,
@@ -71,20 +76,37 @@ class BioParameterAdapter(
                 if (bioParameter.values.size > 1) {
 
                     val chart = itemBinding.bioChart
-                    var listEntry = mutableListOf<Entry>()
+                    val listEntry = mutableListOf<Entry>()
+                    val dateMap = mutableMapOf<Float, String>()
+
 
                     bioParameter.values.forEach { value ->
-                        val x = value.date.toFloat()
+                        val index = (bioParameter.values.indexOf(value) +1).toFloat()
+                        dateMap[index] = value.date.toText()
+
+                        val x = index
                         val y = value.value.toFloat()
                         val entry = Entry(x,y)
                         listEntry.add(entry)
+
                     }
 
                     val dataSet = LineDataSet(listEntry,"")
                     dataSet.setDrawValues(true)
                     val lineData = LineData(dataSet)
                     chart.data = lineData
+
+                    val xAxis = chart.xAxis
+                    xAxis.valueFormatter = object : ValueFormatter(){
+                        override fun getFormattedValue(value: Float): String {
+                            val result = dateMap[value]
+                            return result ?: ""
+                        }
+
+                    }
+
                     chart.setGridBackgroundColor(R.color.white)
+                    chart.animateXY(1000,1000)
                     chart.invalidate()
 
                     if (itemBinding.bioChart.visibility == View.GONE) itemBinding.bioChart.visibility = View.VISIBLE
@@ -157,4 +179,24 @@ class BioParameterAdapter(
         bioParametersList.add(index, updatedBioParameter)
         notifyItemChanged(index)
     }
+
+//    private fun setGraphData(bioValuesList: List<BioParameterValue>): List<Entry>{
+//        val xValues = ArrayList<String>()
+//        val listEntry = ArrayList<Entry>()
+//        bioValuesList.forEach { bioValue->
+//            xValues.add(bioValue.date.toText())
+//            val index = xValues.indexOf(bioValue.date.toText())
+//            val graphValue = bioValue.value.toFloat()
+//            listEntry.add(Entry(graphValue., index.toFloat()))
+//        }
+//        val lineDataSet = LineDataSet(listEntry,"")
+//        val data = LineData(lineDataSet)
+//    }
 }
+//class MyValueFormatter : ValueFormatter(){
+//    override fun getFormattedValue(value: Float): String {
+//        val calendar = Calendar.getInstance()
+//        calendar.timeInMillis = value.toLong()
+//        return calendar.toText()
+//    }
+//}

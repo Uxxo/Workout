@@ -1,10 +1,8 @@
 package com.example.personalworkoutnotebook.ui.activity
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.Toast
@@ -20,7 +18,6 @@ import com.example.personalworkoutnotebook.ui.ViewEvent
 import com.example.personalworkoutnotebook.ui.adapter.BioParameterAdapter
 import com.example.personalworkoutnotebook.ui.viewModel.BioParameterViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
