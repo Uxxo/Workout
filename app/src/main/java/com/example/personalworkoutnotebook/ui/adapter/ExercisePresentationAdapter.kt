@@ -1,6 +1,7 @@
 package com.example.personalworkoutnotebook.ui.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.personalworkoutnotebook.databinding.ItemExercisePresentationBinding
@@ -46,6 +47,13 @@ class ExercisePresentationAdapter(
 
             val setFields: String = setsAsString(exercise.sets)
             exerciseBinding.setsInf.text = setFields
+
+            if(exercise.notes != null){
+                if (exercise.notes.isNotEmpty()){
+                    exerciseBinding.notes.text = exercise.notes
+                    exerciseBinding.notes.visibility = View.VISIBLE
+                }
+            }
         }
 
     }

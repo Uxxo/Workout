@@ -8,9 +8,6 @@
     android:padding="8dp"
     >
 
-
-
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/workoutRecycler"
         android:layout_width="match_parent"

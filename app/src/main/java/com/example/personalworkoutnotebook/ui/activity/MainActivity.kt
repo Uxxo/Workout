@@ -9,7 +9,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.personalworkoutnotebook.databinding.ActivityMainBinding
-import com.example.personalworkoutnotebook.model.Workout
 import com.example.personalworkoutnotebook.ui.ViewEvent
 import com.example.personalworkoutnotebook.ui.adapter.WorkoutPresentationAdapter
 import com.example.personalworkoutnotebook.ui.viewModel.WorkoutViewModel
@@ -28,36 +27,23 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // находим ресайклер и помещаем в него адаптер с пустым списком
-        binding.workoutRecycler.adapter = WorkoutPresentationAdapter(mutableListOf()){ event ->
+        val workoutAdapter = WorkoutPresentationAdapter{ event ->
             when(event){
                 is ViewEvent.DeleteWorkout -> lifecycleScope.launch { workoutViewModel.deleteWorkout(event.workout) }
+                is ViewEvent.DuplicateWorkout -> lifecycleScope.launch { workoutViewModel.duplicateWorkout(event.workout) }
+                is ViewEvent.CopyWorkoutsFields -> lifecycleScope.launch { workoutViewModel.copyWorkoutToBuffer(event.workout.id,this@MainActivity) }
             }
         }
+
+        binding.workoutRecycler.adapter = workoutAdapter
 
         workoutViewModel.isLoading.observe(this) { isVisible ->
             binding.progressLayout.visibility = if (isVisible) View.VISIBLE else View.GONE
         }
 
-            // на liveData-объект workouts вешаем "слушатель", который будет возбуждаться при каждом изменении
-            // объекта workouts
-        workoutViewModel.workouts.observe(this) { workouts ->
-            //помещаем список workouts в новый объект типа WorkoutAdapter и помещаем этот объект
-            //в переменную адаптер которая уже назначена ресайклеру
 
-            val adapter = WorkoutPresentationAdapter(
-              if(workouts.isNotEmpty())  { workouts.sortedByDescending { it.date } as MutableList<Workout> }
-              else mutableListOf()
-            ){ event ->
-                when(event){
-                    is ViewEvent.DeleteWorkout -> lifecycleScope.launch { workoutViewModel.deleteWorkout(event.workout) }
-                    is ViewEvent.CopyWorkoutsFields -> lifecycleScope.launch { workoutViewModel.copyWorkoutToBuffer(event.workout.id,this@MainActivity) }
-                    is ViewEvent.DuplicateWorkout -> lifecycleScope.launch { workoutViewModel.duplicateWorkout(event.workout)}
-                }
-            }
-            binding.workoutRecycler.adapter  = adapter
-            //Сообщаем адаптеру, что данные в нем изменились и нужно перерисоваться
-            adapter.notifyDataSetChanged()
+        workoutViewModel.workouts.observe(this) { workouts ->
+            workoutAdapter.setData(workouts)
         }
 
         binding.startNewWorkout.setOnClickListener {
@@ -92,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             if (id == -1L) return
             val adapter = (binding.workoutRecycler.adapter as WorkoutPresentationAdapter)
             lifecycleScope.launch {
-                workoutViewModel.loadData()
+                workoutViewModel.loadAllWorkouts()
                 adapter.notifyDataSetChanged()
             }
 
@@ -106,8 +92,7 @@ class MainActivity : AppCompatActivity() {
 //        }
         super.onStart()
         lifecycleScope.launch {
-            // запускаем процесс загрузки данных
-            workoutViewModel.loadData()
+            workoutViewModel.loadAllWorkouts()
         }
     }
 

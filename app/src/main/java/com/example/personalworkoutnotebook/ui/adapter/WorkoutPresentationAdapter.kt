@@ -16,13 +16,21 @@ import com.example.personalworkoutnotebook.ui.ViewEvent
 import com.example.personalworkoutnotebook.ui.activity.CreateNewWorkoutActivity
 
 class WorkoutPresentationAdapter(
-    private val workoutList: MutableList<Workout>,
+
     private val callback: (event: ViewEvent) -> Unit
 ) :
     RecyclerView.Adapter<WorkoutPresentationAdapter.WorkoutHolder>() {
 
-    private var visibilityList: MutableList<Boolean> = createVisibilityList()
+    private var workoutList = mutableListOf<Workout>()
 
+    fun setData(incomingWorkoutList: List<Workout>){
+        workoutList = if (incomingWorkoutList.isNotEmpty()){
+            incomingWorkoutList.sortedByDescending { it.date } as MutableList<Workout>
+        } else {
+            incomingWorkoutList as MutableList<Workout>
+        }
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         WorkoutHolder(
@@ -54,29 +62,23 @@ class WorkoutPresentationAdapter(
 
 
             if(workout.status == Workout.FINISHED){
-                itemBinding.picture.setImageResource(R.drawable.done)
+                itemBinding.picture.setImageResource(R.drawable.icon_done)
             }
             if(workout.status == Workout.IN_PROCESS){
                 itemBinding.picture.setImageResource(R.drawable.in_process)
             }
             if(workout.status == Workout.CREATED){
-                itemBinding.picture.setImageResource(R.drawable.clear)
+                itemBinding.picture.setImageResource(R.drawable.icon_plained)
             }
 
-            if (visibilityList[index])itemBinding.exercisePresentationRecycler.visibility = View.VISIBLE
-            else itemBinding.exercisePresentationRecycler.visibility = View.GONE
 
             itemBinding.title.text = workout.name
             itemBinding.date.text = workout.date.toText()
-            if(visibilityList[index]) {
-                itemBinding.deleteWorkout.visibility = View.VISIBLE
-                itemBinding.workoutCopy.visibility = View.VISIBLE
-                itemBinding.duplicateWorkout.visibility = View.VISIBLE
-            } else {
-                itemBinding.deleteWorkout.visibility = View.GONE
-                itemBinding.workoutCopy.visibility = View.GONE
-                itemBinding.duplicateWorkout.visibility = View.GONE
-            }
+            itemBinding.exercisePresentationRecycler.visibility = View.GONE
+            itemBinding.deleteWorkout.visibility = View.GONE
+            itemBinding.workoutCopy.visibility = View.GONE
+            itemBinding.duplicateWorkout.visibility = View.GONE
+
 
             val exerciseAdapter =
                 ExercisePresentationAdapter(workout.exercises as MutableList<Exercise>)
@@ -88,8 +90,17 @@ class WorkoutPresentationAdapter(
                     val intent = CreateNewWorkoutActivity.getIntent(itemView.context, workout.id)
                     itemView.context.startActivity(intent)
                 } else {
-                    changeVisibility(index)
-                    notifyItemChanged(adapterPosition)
+                    if (itemBinding.exercisePresentationRecycler.visibility == View.GONE){
+                        itemBinding.exercisePresentationRecycler.visibility = View.VISIBLE
+                        itemBinding.deleteWorkout.visibility = View.VISIBLE
+                        itemBinding.workoutCopy.visibility = View.VISIBLE
+                        itemBinding.duplicateWorkout.visibility = View.VISIBLE
+                    } else if(itemBinding.exercisePresentationRecycler.visibility == View.VISIBLE){
+                        itemBinding.exercisePresentationRecycler.visibility = View.GONE
+                        itemBinding.deleteWorkout.visibility = View.GONE
+                        itemBinding.workoutCopy.visibility = View.GONE
+                        itemBinding.duplicateWorkout.visibility = View.GONE
+                    }
                 }
             }
 
@@ -129,17 +140,17 @@ class WorkoutPresentationAdapter(
         }
     }
 
-    private fun createVisibilityList(): MutableList<Boolean>{
-        val visibilityList = mutableListOf<Boolean>()
-        for ( i in 0 until workoutList.size){
-            visibilityList.add(false)
-        }
-        return visibilityList
-    }
+//    private fun createVisibilityList(): MutableList<Boolean>{
+//        val visibilityList = mutableListOf<Boolean>()
+//        for ( i in 0 until workoutList.size){
+//            visibilityList.add(false)
+//        }
+//        return visibilityList
+//    }
 
-    private fun changeVisibility(index : Int){
-        val visibility = visibilityList[index]
-        visibilityList[index] = !visibility
-    }
+//    private fun changeVisibility(index : Int){
+//        val visibility = visibilityList[index]
+//        visibilityList[index] = !visibility
+//    }
 
 }

@@ -1,7 +1,6 @@
 package com.example.personalworkoutnotebook.repository
 
 import com.example.personalworkoutnotebook.dao.WorkoutDao
-import com.example.personalworkoutnotebook.extension.toFirstUpperCase
 import com.example.personalworkoutnotebook.model.Workout
 import com.example.personalworkoutnotebook.model.toModel
 import com.example.personalworkoutnotebook.model.toRoom
@@ -14,13 +13,11 @@ class WorkoutRepository @Inject constructor(
 ) {
 
     suspend fun getAll(): List<Workout> {
-        return withContext(Dispatchers.IO) {
-            val workoutList: MutableList<Workout> = mutableListOf()
+        val workoutList: MutableList<Workout> = mutableListOf()
             workoutDao.getWorkoutWithExercises()?.forEach { roomWorkoutWithExercises ->
                 workoutList.add(roomWorkoutWithExercises.toModel())
             }
-            workoutList
-        }
+            return workoutList
     }
 
     suspend fun getById(id: Long): Workout? {

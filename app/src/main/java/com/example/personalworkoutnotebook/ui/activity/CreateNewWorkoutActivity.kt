@@ -39,22 +39,28 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
     private var isCountDownTimer1 = false
     private var isCountDownTimer2 = false
 
-    private lateinit var actualWorkout: Workout
-    private lateinit var uniqueExercises: List<Exercise>
+    private lateinit var workoutName: String
 
-
-    private val timerValueReceiver = object : BroadcastReceiver(){
+    private val timerValueReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val minutes = intent?.getIntExtra("minutes", -1)
             val seconds = intent?.getIntExtra("seconds", -1)
             val timersNumber = intent?.getIntExtra("timersNumber", -1)
             val isTimerStarted = intent?.getBooleanExtra("isTimerStarted", false)
 
-            if(timersNumber == TIMER_1){binding.timer1.text = toTimeForm(minutes!!,seconds!!)}
-            if(timersNumber == TIMER_2){binding.timer2.text = toTimeForm(minutes!!,seconds!!)}
-            if (isTimerStarted != null){
-                if (timersNumber == TIMER_1){isCountDownTimer1 = isTimerStarted}
-                if (timersNumber == TIMER_2){isCountDownTimer2 = isTimerStarted}
+            if (timersNumber == TIMER_1) {
+                binding.timer1.text = toTimeForm(minutes!!, seconds!!)
+            }
+            if (timersNumber == TIMER_2) {
+                binding.timer2.text = toTimeForm(minutes!!, seconds!!)
+            }
+            if (isTimerStarted != null) {
+                if (timersNumber == TIMER_1) {
+                    isCountDownTimer1 = isTimerStarted
+                }
+                if (timersNumber == TIMER_2) {
+                    isCountDownTimer2 = isTimerStarted
+                }
             }
         }
     }
@@ -71,33 +77,52 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
         binding = ActivityCreateWorkoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.workoutDate.requestFocus()
 
-        workoutViewModel.workout.observe(this){ workout ->
-
-            actualWorkout = workout
-
-            if(actualWorkout.status == Workout.CREATED){
-                binding.startAndFinishButton.setImageResource(R.drawable.ic_start)
-                binding.workoutDate.visibility = View.INVISIBLE
+        val exerciseAdapter = ExerciseAdapter(this,HolderTypeConstants.WORKOUT_EXERCISE_HOLDER){ event ->
+            when (event) {
+                is ViewEvent.SaveSet -> lifecycleScope.launch {
+                    workoutViewModel.saveSet(event.set) }
+                is ViewEvent.DeleteSet -> lifecycleScope.launch { workoutViewModel.deleteSet(event.set) }
+                is ViewEvent.SaveExercise -> lifecycleScope.launch { workoutViewModel.saveExercise(event.exercise) }
+                is ViewEvent.DeleteExercise -> lifecycleScope.launch { workoutViewModel.deleteExercise(event.exercise.id) }
+                is ViewEvent.AddSetToExercise -> lifecycleScope.launch { workoutViewModel.addSetToExercise(event.exercise.id) }
             }
+        }
 
-            if(actualWorkout.status == Workout.IN_PROCESS){
-                binding.startAndFinishButton.setImageResource(R.drawable.ic_finish)
-                binding.workoutDate.visibility = View.INVISIBLE
-            }
 
-            binding.workoutTitle.editText?.setText(actualWorkout.name)
-            binding.workoutTitle.editText?.afterTextChanged {
-                actualWorkout = actualWorkout.copy(name = it)
-                lifecycleScope.launch {
-                    workoutViewModel.saveWorkout(actualWorkout)
+        workoutViewModel.workout.observe(this) { workout ->
+
+            workoutName = workout.name
+
+            when(workout.status){
+                Workout.CREATED->{
+                    binding.startAndFinishButton.setImageResource(R.drawable.ic_start)
+                    binding.workoutDate.visibility = View.INVISIBLE
                 }
+
+                Workout.IN_PROCESS -> {
+                    binding.startAndFinishButton.setImageResource(R.drawable.ic_finish)
+                    binding.workoutDate.visibility = View.INVISIBLE
+                }
+            }
+
+            if( workout.name !="" && binding.workoutTitle.editText?.text.toString() != workout.name){
+                println()
+                binding.workoutTitle.editText?.setText(workout.name)
+            }
+
+            binding.workoutTitle.editText?.afterTextChanged {
+                val editedWorkout = workout.copy(name = it)
+                    lifecycleScope.launch {
+                        workoutViewModel.saveWorkout(editedWorkout)
+                        workoutName = it
+                    }
+
             }
 
             binding.workoutCopy.setOnClickListener {
                 lifecycleScope.launch {
-                    workoutViewModel.copyWorkoutToBuffer(actualWorkout.id, this@CreateNewWorkoutActivity)
+                    workoutViewModel.copyWorkoutToBuffer(workout.id, this@CreateNewWorkoutActivity)
                 }
             }
 
@@ -105,12 +130,12 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                 AlertDialog.Builder(this)
                     .setTitle("Are you shore?")
                     .setMessage("This workout will be permanently deleted")
-                    .setPositiveButton(android.R.string.ok){_,_ ->
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
                         lifecycleScope.launch {
-                            workoutViewModel.deleteWorkout(actualWorkout)
+                            workoutViewModel.deleteWorkout(workout)
                         }
                         setResult(Activity.RESULT_OK, Intent().apply {
-                            putExtra(MainActivity.EXTRA_ID, actualWorkout.id)
+                            putExtra(MainActivity.EXTRA_ID, workout.id)
                         })
                         finish()
                     }
@@ -118,57 +143,69 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                     .show()
             }
 
-            workoutViewModel.uniqueExercises.observe(this){ exercises ->
-                uniqueExercises = exercises
+            binding.exerciseRecycler.adapter = exerciseAdapter
+            exerciseAdapter.setExercises(workout.exercises)
+            exerciseAdapter.setWorkoutStatus(workout.status)
 
-                val adapter = getExerciseAdapter()
 
-                binding.exerciseRecycler.adapter = adapter
-                adapter.notifyDataSetChanged()
+            binding.startAndFinishButton.setOnClickListener {
+                lifecycleScope.launch { workoutViewModel.updateWorkoutValue(workout.id) }
+                when(workout.status){
+                    Workout.CREATED ->{
+                        val actualDate = Calendar.getInstance()
+                        val editedWorkout = workout.copy(date = actualDate, status = Workout.IN_PROCESS, name = workoutName)
+                        lifecycleScope.launch {
+                            workoutViewModel.updateWorkout(editedWorkout)
+                        }
+                    }
 
-                binding.startAndFinishButton.setOnClickListener {
-                    if(actualWorkout.status == Workout.IN_PROCESS){
-                        val editedWorkout = actualWorkout.copy(status = Workout.FINISHED)
+                    Workout.IN_PROCESS ->{
+                        val editedWorkout = workout.copy(status = Workout.FINISHED, name = workoutName)
                         lifecycleScope.launch {
                             workoutViewModel.saveWorkout(editedWorkout)
+                            workoutViewModel.loadAllWorkouts()
                         }
                         finish()
                     }
-                    if(actualWorkout.status == Workout.CREATED){
-                        val actualDate = Calendar.getInstance()
-                        val editedWorkout = actualWorkout.copy(date = actualDate, status = Workout.IN_PROCESS)
-                        lifecycleScope.launch {
-                            workoutViewModel.saveWorkout(editedWorkout)
-                            workoutViewModel.loadWorkoutById(editedWorkout.id)
-                        }
-
-                        binding.startAndFinishButton.setImageResource(R.drawable.ic_finish)
-                        val editedAdapter = getExerciseAdapter()
-                        binding.exerciseRecycler.adapter = editedAdapter
-                        editedAdapter.notifyDataSetChanged()
-                    }
                 }
-
             }
 
-            if(actualWorkout.exercises.isNotEmpty()) binding.exerciseRecycler.smoothScrollToPosition(actualWorkout.exercises.size -1)
+            if (workout.exercises.isNotEmpty()) binding.exerciseRecycler.smoothScrollToPosition(
+                workout.exercises.size - 1
+            )
 
-            if(!actualWorkout.timers[TIMER_1].isTimeEmpty()){binding.timer1.text = actualWorkout.timers[TIMER_1].toText()}
-            if(!actualWorkout.timers[TIMER_2].isTimeEmpty()){binding.timer2.text = actualWorkout.timers[TIMER_2].toText()}
+            if (!workout.timers[TIMER_1].isTimeEmpty()) {
+                binding.timer1.text = workout.timers[TIMER_1].toText()
+            }
+            if (!workout.timers[TIMER_2].isTimeEmpty()) {
+                binding.timer2.text = workout.timers[TIMER_2].toText()
+            }
 
             binding.timer1.setOnClickListener {
-                val timer = actualWorkout.timers[TIMER_1]
+                val timer = workout.timers[TIMER_1]
                 if (timer.isTimeEmpty()) {
-                    showTimePickerDialog(TIMER_1)
+                    showTimePickerDialog(workout, TIMER_1)
                 } else {
 
                     if (!isCountDownTimer1 && !isCountDownTimer2) {
 
-                        startService(CountDownService.getIntent(this, timer.minutes, timer.seconds, TIMER_1))
+                        startService(
+                            CountDownService.getIntent(
+                                this,
+                                timer.minutes,
+                                timer.seconds,
+                                TIMER_1
+                            )
+                        )
                     } else {
                         if (isCountDownTimer1) {
                             stopService(
-                                CountDownService.getIntent(this, timer.minutes, timer.seconds, TIMER_1)
+                                CountDownService.getIntent(
+                                    this,
+                                    timer.minutes,
+                                    timer.seconds,
+                                    TIMER_1
+                                )
                             )
                             binding.timer1.text = timer.toText()
                             isCountDownTimer1 = false
@@ -177,57 +214,73 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                 }
             }
 
-                binding.timer1.setOnLongClickListener {
-                    val timer = actualWorkout.timers[TIMER_1]
-                    if(isCountDownTimer1){
-                        stopService(CountDownService.getIntent(this,-1,-1, TIMER_1))
-                        binding.timer1.text = timer.toText()
-                        isCountDownTimer1 = false
-                    }
-                    showTimePickerDialog(TIMER_1)
-                    return@setOnLongClickListener true
+            binding.timer1.setOnLongClickListener {
+                val timer = workout.timers[TIMER_1]
+                if (isCountDownTimer1) {
+                    stopService(CountDownService.getIntent(this, -1, -1, TIMER_1))
+                    binding.timer1.text = timer.toText()
+                    isCountDownTimer1 = false
                 }
-
-                binding.timer2.setOnClickListener {
-                    val timer = actualWorkout.timers[TIMER_2]
-                    if (timer.isTimeEmpty()) {
-                        showTimePickerDialog(TIMER_2)
-                    } else {
-                        if(!isCountDownTimer2 && !isCountDownTimer1){
-                            startService(CountDownService.getIntent(this, timer.minutes, timer.seconds, TIMER_2))
-                        } else{
-                            if(isCountDownTimer2){
-                                stopService(CountDownService.getIntent(this, timer.minutes, timer.seconds, TIMER_2))
-                                binding.timer2.text = timer.toText()
-                                isCountDownTimer2 = false
-                            }
-                        }
-                    }
-                }
-
-
-            binding.timer2.setOnLongClickListener {
-                val timer = actualWorkout.timers[TIMER_2]
-                if(isCountDownTimer2){
-                    stopService(CountDownService.getIntent(this,-1, -1, TIMER_2))
-                    binding.timer2.text = timer.toText()
-                    isCountDownTimer2 = false
-                }
-                showTimePickerDialog(TIMER_2)
+                showTimePickerDialog(workout, TIMER_1)
                 return@setOnLongClickListener true
             }
 
-        }
-
-        workoutViewModel.isLoading.observe(this){ isLoading ->
-            binding.workoutProgressLayout.isVisible(isLoading)
-        }
-
-
-        binding.startNewExercise.setOnClickListener {
-            lifecycleScope.launch{
-                workoutViewModel.addNewExerciseToWorkout(workoutViewModel.workout.value!!.id)
+            binding.timer2.setOnClickListener {
+                val timer = workout.timers[TIMER_2]
+                if (timer.isTimeEmpty()) {
+                    showTimePickerDialog(workout, TIMER_2)
+                } else {
+                    if (!isCountDownTimer2 && !isCountDownTimer1) {
+                        startService(
+                            CountDownService.getIntent(
+                                this,
+                                timer.minutes,
+                                timer.seconds,
+                                TIMER_2
+                            )
+                        )
+                    } else {
+                        if (isCountDownTimer2) {
+                            stopService(
+                                CountDownService.getIntent(
+                                    this,
+                                    timer.minutes,
+                                    timer.seconds,
+                                    TIMER_2
+                                )
+                            )
+                            binding.timer2.text = timer.toText()
+                            isCountDownTimer2 = false
+                        }
+                    }
+                }
             }
+
+            binding.timer2.setOnLongClickListener {
+                val timer = workout.timers[TIMER_2]
+                if (isCountDownTimer2) {
+                    stopService(CountDownService.getIntent(this, -1, -1, TIMER_2))
+                    binding.timer2.text = timer.toText()
+                    isCountDownTimer2 = false
+                }
+                showTimePickerDialog(workout, TIMER_2)
+                return@setOnLongClickListener true
+            }
+
+
+            binding.startNewExercise.setOnClickListener {
+                lifecycleScope.launch {
+                    workoutViewModel.addNewExerciseToWorkout(workout.id)
+                }
+            }
+        }
+
+        workoutViewModel.uniqueExercises.observe(this) { uniqueExercises ->
+            exerciseAdapter.setUniqueExercises(uniqueExercises)
+        }
+
+        workoutViewModel.isLoading.observe(this) { isLoading ->
+            binding.workoutProgressLayout.isVisible(isLoading)
         }
 
 
@@ -236,71 +289,57 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         lifecycleScope.launch {
-            workoutViewModel.loadWorkoutById(intent.getLongExtra("EXTRA_WORKOUT_ID", -1))
-            workoutViewModel.loadUniqueExercises()
+            workoutViewModel.updateWorkoutValue(intent.getLongExtra("EXTRA_WORKOUT_ID", -1))
+            workoutViewModel.getUniqueExercises()
         }
     }
 
-    private fun getExerciseAdapter(): ExerciseAdapter{
-        return ExerciseAdapter(
-            this,HolderTypeConstants.WORKOUT_EXERCISE_HOLDER, actualWorkout.status ,actualWorkout.exercises.toMutableList(),uniqueExercises
-        )
-        { event ->
-            when(event) {
-                is ViewEvent.SaveSet -> lifecycleScope.launch { workoutViewModel.saveSet(event.set) }
-                is ViewEvent.DeleteSet -> lifecycleScope.launch { workoutViewModel.deleteSet(event.set) }
-                is ViewEvent.SaveExercise -> lifecycleScope.launch { workoutViewModel.saveExercise(event.exercise) }
-                is ViewEvent.DeleteExercise -> lifecycleScope.launch { workoutViewModel.deleteExercise(event.exercise.id) }
-                is ViewEvent.AddSetToExercise -> lifecycleScope.launch { workoutViewModel.addSetToExercise(event.exercise.id) }
-            }
 
-        }
-    }
+    private fun showTimePickerDialog(workout: Workout, timer: Int) {
+        val minutes = workout.timers[timer].minutes
+        val seconds = workout.timers[timer].seconds
 
-    private fun showTimePickerDialog(timer: Int) {
-        val minutes = actualWorkout.timers[timer].minutes
-        val seconds = actualWorkout.timers[timer].seconds
-
-        TimePickerDialog(this,AlertDialog.THEME_HOLO_LIGHT,
+        TimePickerDialog(this, AlertDialog.THEME_HOLO_LIGHT,
             { _, hourOfDay, minute ->
-                    updateTimer(hourOfDay,minute, timer)
-            }, minutes, seconds, true)
+                updateTimer(workout, hourOfDay, minute, timer)
+            }, minutes, seconds, true
+        )
             .show()
-
     }
 
-    private fun updateTimer(minutes: Int, seconds: Int, timerNumber: Int){
-        if(timerNumber == TIMER_1){
-            val updatedTimer = actualWorkout.timers[TIMER_1].copy(minutes = minutes, seconds = seconds)
+    private fun updateTimer(workout: Workout, minutes: Int, seconds: Int, timerNumber: Int) {
+        if (timerNumber == TIMER_1) {
+            val updatedTimer = workout.timers[TIMER_1].copy(minutes = minutes, seconds = seconds)
 
-            val updatedTimersList = mutableListOf(updatedTimer, actualWorkout.timers[TIMER_2])
+            val updatedTimersList = mutableListOf(updatedTimer, workout.timers[TIMER_2])
 
-            actualWorkout = actualWorkout.copy(timers = updatedTimersList)
-            binding.timer1.text = actualWorkout.timers[0].toText()
+            val editedWorkout = workout.copy(timers = updatedTimersList)
+            binding.timer1.text = editedWorkout.timers[TIMER_1].toText()
 
             lifecycleScope.launch {
                 workoutViewModel.saveTimer(updatedTimer)
-           }
+            }
 
         }
 
-        if(timerNumber == TIMER_2){
-            val updatedTimer = actualWorkout.timers[TIMER_2].copy(minutes = minutes, seconds = seconds)
+        if (timerNumber == TIMER_2) {
+            val updatedTimer = workout.timers[TIMER_2].copy(minutes = minutes, seconds = seconds)
 
-            val updatedTimerList = mutableListOf(actualWorkout.timers[TIMER_1], updatedTimer)
-            actualWorkout = actualWorkout.copy(timers = updatedTimerList)
-            binding.timer2.text = actualWorkout.timers[TIMER_2].toText()
+            val updatedTimerList = mutableListOf(workout.timers[TIMER_1], updatedTimer)
+            val editedWorkout = workout.copy(timers = updatedTimerList)
+            binding.timer2.text = editedWorkout.timers[TIMER_2].toText()
 
-            lifecycleScope.launch {workoutViewModel.saveTimer(updatedTimer)
+            lifecycleScope.launch {
                 workoutViewModel.saveTimer(updatedTimer)
+
             }
 
         }
     }
 
 
-    private fun toTimeForm(minutes: Int, seconds: Int) : String{
-        return if(seconds <10) "$minutes:0$seconds"
+    private fun toTimeForm(minutes: Int, seconds: Int): String {
+        return if (seconds < 10) "$minutes:0$seconds"
         else "$minutes:$seconds"
     }
 
@@ -308,7 +347,7 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
     companion object {
         const val TIMER_1 = 0
         const val TIMER_2 = 1
-        private const val ID_EXTRA ="EXTRA_WORKOUT_ID"
+        private const val ID_EXTRA = "EXTRA_WORKOUT_ID"
         fun getIntent(context: Context, id: Long): Intent =
             Intent(context, CreateNewWorkoutActivity::class.java).apply {
                 putExtra(ID_EXTRA, id)

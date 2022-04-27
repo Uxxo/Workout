@@ -2,11 +2,12 @@ package com.example.personalworkoutnotebook.model
 
 import androidx.room.*
 import com.example.personalworkoutnotebook.extension.toFirstUpperCase
+import kotlin.math.max
 
 data class Exercise(
     val id: Long = 0L,
     val workoutId: Long,
-    val name: String,
+    val name: String?,
     val notes: String?,
     val group: String?,
     val sets: List<Set> = listOf()
@@ -19,7 +20,7 @@ data class Exercise(
                 onDelete = ForeignKey.CASCADE)])
 data class RoomExercise(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long,
-    @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "name") val name: String?,
     @ColumnInfo(name = "notes") val notes: String?,
     @ColumnInfo(name = "group") val group: String?,
     @ColumnInfo(name = "workout_id", index = true) val workoutId: Long
@@ -34,10 +35,9 @@ data class RoomExerciseWithSet(
 
 fun Exercise.toRoom() = RoomExercise(
     id = this.id,
-    name = this.name.toFirstUpperCase(),
+    name = this.name?.toFirstUpperCase(),
     notes = this.notes,
-    group = if (this.group != null) this.group.toFirstUpperCase()
-            else null,
+    group = this.group?.toFirstUpperCase(),
     workoutId = this.workoutId
 )
 
@@ -62,5 +62,13 @@ fun Exercise.getMaxMass(): Double{
 
     return if(maxMass == -1000.0) 0.0
             else maxMass
+}
+
+fun Exercise.getMaxRepeat(incomingMass:Double): Int{
+    var maxRepeat = 0
+    sets.forEach { set ->
+        if(set.mass == incomingMass && set.repeat > maxRepeat) maxRepeat = set.repeat
+    }
+    return maxRepeat
 }
 

@@ -23,5 +23,12 @@
         tools:text="Sets"
         />
 
+    <TextView
+        android:id="@+id/notes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Notes"
+        android:visibility="gone"
+        />
 
 </androidx.appcompat.widget.LinearLayoutCompat>
