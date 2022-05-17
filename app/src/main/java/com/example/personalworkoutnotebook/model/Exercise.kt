@@ -2,6 +2,7 @@ package com.example.personalworkoutnotebook.model
 
 import androidx.room.*
 import com.example.personalworkoutnotebook.extension.toFirstUpperCase
+import java.util.*
 import kotlin.math.max
 
 data class Exercise(
@@ -51,7 +52,6 @@ fun RoomExerciseWithSet.toModel(): Exercise = Exercise(
 )
 
 
-
 fun Exercise.getMaxMass(): Double{
     var maxMass = if(sets.isNotEmpty() && sets[0].repeat !=0) sets[0].mass
                     else -1000.0
@@ -71,4 +71,14 @@ fun Exercise.getMaxRepeat(incomingMass:Double): Int{
     }
     return maxRepeat
 }
+
+data class ExerciseWithDate(
+    val id: Long = 0L,
+    val workoutId: Long,
+    val date:Calendar,
+    val name: String?,
+    val notes: String?,
+    val group: String?,
+    val sets: List<Set> = listOf()
+)
 
