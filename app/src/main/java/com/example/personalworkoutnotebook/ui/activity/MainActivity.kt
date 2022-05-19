@@ -55,13 +55,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        binding.myWorkouts.drawable.setTint(Color.BLUE)
-        binding.myExercises.setOnClickListener {
+        binding.menuButtonsLayout.myWorkouts.drawable.setTint(Color.BLUE)
+        binding.menuButtonsLayout.myExercises.setOnClickListener {
             startActivity(Intent(this, ExercisesActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY))
         }
 
-        binding.myBio.setOnClickListener {
+        binding.menuButtonsLayout.myBio.setOnClickListener {
             startActivity(Intent(this, BioParametersActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY))
         }

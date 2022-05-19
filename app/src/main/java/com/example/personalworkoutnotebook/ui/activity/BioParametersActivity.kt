@@ -56,13 +56,13 @@ class BioParametersActivity : AppCompatActivity() {
             createBioParameterDialog()
         }
 
-        binding.myBio.drawable.setTint(Color.BLUE)
+        binding.menuButtonsLayout.myBio.drawable.setTint(Color.BLUE)
 
-        binding.myWorkouts.setOnClickListener {
+        binding.menuButtonsLayout.myWorkouts.setOnClickListener {
             finish()
         }
 
-        binding.myExercises.setOnClickListener {
+        binding.menuButtonsLayout.myExercises.setOnClickListener {
             startActivity(Intent(this, ExercisesActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY))
         }
