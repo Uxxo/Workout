@@ -39,12 +39,12 @@ class ExercisesActivity : AppCompatActivity() {
             groupAdapter.setGroupList(groups)
         }
 
-        binding.myExercises.drawable.setTint(Color.BLUE)
-        binding.myWorkouts.setOnClickListener {
+        binding.menuButtonsLayout.myExercises.drawable.setTint(Color.BLUE)
+        binding.menuButtonsLayout.myWorkouts.setOnClickListener {
             finish()
         }
 
-        binding.myBio.setOnClickListener {
+        binding.menuButtonsLayout.myBio.setOnClickListener {
             startActivity(Intent(this, BioParametersActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY))
         }

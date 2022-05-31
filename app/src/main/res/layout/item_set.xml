@@ -29,7 +29,7 @@
                 android:inputType="number"
                 android:digits="0123456789.-"
                 android:singleLine="true"
-                android:gravity="center"
+                android:importantForAutofill="no"
                 />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -48,7 +48,6 @@
                 android:inputType="numberSigned"
                 android:digits="0123456789"
                 android:singleLine="true"
-                android:gravity="center"
                 />
         </com.google.android.material.textfield.TextInputLayout>
 
