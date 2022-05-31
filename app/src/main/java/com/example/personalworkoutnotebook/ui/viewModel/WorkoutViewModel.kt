@@ -234,6 +234,21 @@ class WorkoutViewModel @Inject constructor(
         return exerciseRepository.save(exercise).id
     }
 
+    suspend fun renameExercises(exerciseId: Long, incomingTitle: String, incomingGroup: String){
+        val oldExercise = exerciseRepository.getById(exerciseId) ?: return
+        val allExercisesList = exerciseRepository.getAll()
+       allExercisesList.forEach { exercise ->
+           println()
+            if(exercise?.name == oldExercise.name && exercise?.group == oldExercise.group ){
+                val newGroup = if (incomingGroup == "") null
+                                else incomingGroup
+                val exerciseForUpdate = exercise!!.copy(name = incomingTitle, group = newGroup)
+                exerciseRepository.save(exerciseForUpdate)
+            }
+        }
+        loadExerciseById(exerciseId)
+    }
+
 //    suspend fun loadExercisesDataForGraphic(id: Long) {
 //        val exercise = exerciseRepository.getById(id) ?: return
 //        if (exercise.name == null) return

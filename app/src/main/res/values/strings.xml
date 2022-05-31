@@ -31,7 +31,9 @@
     <string name="this_exercise_will_be_permanently_deleted">This exercise will be permanently deleted</string>
     <string name="this_bio_parameter_will_be_permanently_deleted">This bio parameter will be permanently deleted</string>
     <string name="this_value_will_be_permanently_deleted">This value will be permanently deleted</string>
-
+    <string name="delete_this_bio_parameter">Delete this Bio Parameter</string>
+    <string name="new_exercise_title">New exercise title:</string>
+    <string name="new_exercise_group">New exercise group:</string>
 
 
 </resources>

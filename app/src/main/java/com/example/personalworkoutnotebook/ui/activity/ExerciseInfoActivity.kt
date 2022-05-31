@@ -1,15 +1,22 @@
 package com.example.personalworkoutnotebook.ui.activity
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.personalworkoutnotebook.R
 import com.example.personalworkoutnotebook.databinding.ActivityExerciseInfoBinding
 import com.example.personalworkoutnotebook.extension.toText
+import com.example.personalworkoutnotebook.model.Exercise
 import com.example.personalworkoutnotebook.model.ExerciseWithDate
 import com.example.personalworkoutnotebook.model.Set
+import com.example.personalworkoutnotebook.ui.ViewEvent
+import com.example.personalworkoutnotebook.ui.adapter.ExerciseInfoAdapter
 import com.example.personalworkoutnotebook.ui.viewModel.WorkoutViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -19,11 +26,15 @@ class ExerciseInfoActivity : AppCompatActivity(){
 
     private lateinit var binding: ActivityExerciseInfoBinding
     private val workoutViewModel : WorkoutViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityExerciseInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val adapter = ExerciseInfoAdapter()
+        binding.fieldsRecycler.adapter = adapter
 
         workoutViewModel.exercise.observe(this){ exercise ->
             lifecycleScope.launch {
@@ -31,10 +42,13 @@ class ExerciseInfoActivity : AppCompatActivity(){
             }
 
             binding.exerciseTitle.text = exercise.name
+            binding.renameExercise.setOnClickListener {
+                createExerciseRenamingDialog(this,exercise)
+            }
         }
 
         workoutViewModel.exerciseWithDate.observe(this){exercisesList ->
-            binding.dateAndSetsValue.text = setsAndDatesToString(exercisesList.sortedByDescending { it.date })
+            adapter.setExercisesList(exercisesList)
         }
 
     }
@@ -52,35 +66,26 @@ class ExerciseInfoActivity : AppCompatActivity(){
             .addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY))
     }
 
-    private fun setsAndDatesToString(exercises: List<ExerciseWithDate>): String{
-        var resultString = ""
-        exercises.forEach {exercise ->
-            val exerciseAsString = "\n" + exercise.date.toText() + "\n"+ setsAsString(exercise.sets) +"\n"
-            resultString +=exerciseAsString
+
+    private fun createExerciseRenamingDialog(context: Context,exercise: Exercise){
+        val layoutInflater = LayoutInflater.from(context)
+        val dialogView = layoutInflater.inflate(R.layout.item_ceate_dialog_for_exercise_rename, null)
+        val dialogBuilder = AlertDialog.Builder(context)
+        dialogBuilder.setView(dialogView)
+
+        dialogView.findViewById<EditText>(R.id.input_new_exercise_title).setText(exercise.name)
+        dialogView.findViewById<EditText>(R.id.input_new_exercise_group).setText(exercise.group)
+
+        dialogBuilder.setPositiveButton(android.R.string.ok){_,_ ->
+            val newTitle = dialogView.findViewById<EditText>(R.id.input_new_exercise_title).text.toString()
+            val newGroup = dialogView.findViewById<EditText>(R.id.input_new_exercise_group).text.toString()
+           lifecycleScope.launch {
+               workoutViewModel.renameExercises(exercise.id,newTitle, newGroup)
+           }
         }
-        return resultString
-    }
 
-    private fun setsAsString(sets: List<Set>): String{
-        var resultString = ""
-
-        sets.forEach {
-            val index = sets.indexOf(it)
-            var mass = ""
-            if (index == 0) mass = wholeOrNot(it.mass) + ":"
-            if(index > 0 && it.mass != sets[index-1].mass && it.mass !=0.0) {
-                mass = "\n" + wholeOrNot(it.mass) + ":"
-            }
-            val repeat = if(it.repeat !=0) {" /${it.repeat}"}
-            else{""}
-            resultString += mass + repeat
-        }
-        return resultString
-    }
-
-    private fun wholeOrNot(value: Double):String{
-        return if(value - value.toInt() ==0.0){value.toInt().toString()}
-        else value.toString()
+        dialogBuilder.setNegativeButton(android.R.string.cancel,null)
+        dialogBuilder.show()
     }
 
     companion object{

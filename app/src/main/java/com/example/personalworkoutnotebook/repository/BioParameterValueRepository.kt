@@ -35,6 +35,7 @@ class BioParameterValueRepository @Inject constructor(val bioParameterValueDao: 
     }
 
     suspend fun save(bioParameterValue: BioParameterValue): BioParameterValue{
+        println()
         return if(bioParameterValueDao.getOneById(bioParameterValue.id) !=null){
             bioParameterValueDao.update(bioParameterValue.toRoom())
             bioParameterValueDao.getOneById(bioParameterValue.id)!!.toModel()
@@ -45,6 +46,7 @@ class BioParameterValueRepository @Inject constructor(val bioParameterValueDao: 
     }
 
     suspend fun delete(bioParameterValue: BioParameterValue): Boolean{
+        println()
         if (bioParameterValueDao.getOneById(bioParameterValue.id) != null){
             bioParameterValueDao.delete(bioParameterValue.toRoom())
         }

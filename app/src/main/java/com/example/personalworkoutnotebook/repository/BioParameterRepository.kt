@@ -18,6 +18,7 @@ class BioParameterRepository @Inject constructor(
             bioParameterDao.getAllBioParameters()?.forEach { roomBioParameter ->
                 bioParameterList.add(roomBioParameter.toModel())
             }
+
             bioParameterList
         }
     }

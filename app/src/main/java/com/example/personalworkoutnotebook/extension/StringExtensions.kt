@@ -3,6 +3,7 @@ package com.example.personalworkoutnotebook.extension
 import java.util.*
 
 fun String.toFirstUpperCase() = this.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+
 fun String.isValidDouble(): Boolean {
     if (this.isBlank()) return false
     if (this.contains(' ')) return false

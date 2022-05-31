@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="8dp">
 
@@ -11,14 +12,35 @@
         style="@style/TitleStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/fields_recycler"
         tools:text="Exercise title" />
 
-    <TextView
-        android:id="@+id/dateAndSetsValue"
+    <ImageButton
+        android:id="@+id/rename_exercise"
+        android:src="@drawable/ic_pencil"
+        style="@style/Widget.MaterialComponents.FloatingActionButton"
+        android:paddingEnd="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/exerciseTitle"
+        tools:ignore="RtlSymmetry"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/fields_recycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="sets info"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/exerciseTitle"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:orientation="vertical"
+        tools:listitem="@layout/item_exercise_info"
         />
 
 
-</LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

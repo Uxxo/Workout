@@ -16,6 +16,8 @@ import com.example.personalworkoutnotebook.extension.toText
 import com.example.personalworkoutnotebook.model.BioParameter
 import com.example.personalworkoutnotebook.model.BioParameterValue
 import com.example.personalworkoutnotebook.ui.ViewEvent
+import com.example.personalworkoutnotebook.ui.activity.BioParameterInfoActivity
+import com.example.personalworkoutnotebook.ui.activity.BioParametersActivity
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.Entry
@@ -27,11 +29,16 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class BioParameterAdapter(
-    private val bioParametersList: MutableList<BioParameter>,
     private val context: Context,
     private val callback: (event: ViewEvent) -> Unit
 ) :
     RecyclerView.Adapter<BioParameterAdapter.BioParametersHolder>() {
+
+    private var bioParametersList = mutableListOf<BioParameter>()
+
+    fun setBioParameters(incomingParametersList: List<BioParameter>) {
+        bioParametersList = incomingParametersList as MutableList<BioParameter>
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         BioParametersHolder(
@@ -53,150 +60,57 @@ class BioParameterAdapter(
     inner class BioParametersHolder(private val itemBinding: ItemBioParameterBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
 
-        fun bind(bioParameter: BioParameter) {
+        private val valueAdapter = BioValueAdapter(callback)
 
-            val valueAdapter = BioValueAdapter(bioParameter.values as MutableList<BioParameterValue>,callback)
+        fun bind(bioParameter: BioParameter) {
 
             itemBinding.root.tag = bioParametersList.indexOf(bioParameter)
 
             itemBinding.bioParameterTitle.text = bioParameter.name
+
             if (bioParameter.values.isNotEmpty()) {
                 val actualValue = bioParameter.values[bioParameter.values.size - 1]
                 itemBinding.bioParameterValue.text = actualValue.value.toString()
                 itemBinding.bioParameterDate.text = actualValue.date.toText()
             }
 
-
             itemBinding.addValueButton.setOnClickListener {
                 val index = itemBinding.root.tag as Int
-                createSetValueDialog(context,bioParameter,index)
+                createSetValueDialog(context, bioParameter, index)
             }
 
             itemBinding.root.setOnClickListener {
-                if (bioParameter.values.size > 1) {
 
-                    val chart = itemBinding.bioChart
-                    val listEntry = mutableListOf<Entry>()
-                    val dateMap = mutableMapOf<Float, String>()
+                val intent = BioParameterInfoActivity.getIntent(context, bioParameter.id)
+                callback.invoke(ViewEvent.StartBioParameterInfoActivity(intent))
 
+            }
+        }
 
-                    bioParameter.values.forEach { value ->
-                        val index = (bioParameter.values.indexOf(value) +1).toFloat()
-                        dateMap[index] = value.date.toText()
+        private fun createSetValueDialog(context: Context, bioParameter: BioParameter, index: Int) {
+            val layoutInflater = LayoutInflater.from(context)
+            val dialogView = layoutInflater.inflate(R.layout.item_set_new_bio_value_dialog, null)
+            val dialogBuilder = AlertDialog.Builder(context)
+            dialogBuilder.setView(dialogView)
+            val edittext = dialogView.findViewById<EditText>(R.id.input_text)
 
-                        val x = index
-                        val y = value.value.toFloat()
-                        val entry = Entry(x,y)
-                        listEntry.add(entry)
-
-                    }
-
-                    val dataSet = LineDataSet(listEntry,"")
-                    dataSet.setDrawValues(true)
-                    val lineData = LineData(dataSet)
-                    chart.data = lineData
-
-                    val xAxis = chart.xAxis
-                    xAxis.valueFormatter = object : ValueFormatter(){
-                        override fun getFormattedValue(value: Float): String {
-                            val result = dateMap[value]
-                            return result ?: ""
-                        }
-
-                    }
-
-                    chart.setGridBackgroundColor(R.color.white)
-                    chart.animateXY(1000,1000)
-                    chart.invalidate()
-
-                    if (itemBinding.bioChart.visibility == View.GONE) itemBinding.bioChart.visibility = View.VISIBLE
-                    else itemBinding.bioChart.visibility = View.GONE
-                }
-                if (itemBinding.valuesRecycler.visibility == View.GONE){
-
-                    itemBinding.valuesRecycler.adapter = valueAdapter
-
-                    itemBinding.valuesRecycler.visibility = View.VISIBLE
-                    itemBinding.deleteBioParameter.visibility = View.VISIBLE
+            dialogBuilder.setPositiveButton(android.R.string.ok) { _, _ ->
+                val newValuesText = edittext.text.toString()
+                if (newValuesText.isValidDouble()) {
+                    addNewValue(newValuesText, bioParameter)
                 } else {
-                    itemBinding.valuesRecycler.visibility = View.GONE
-                    itemBinding.deleteBioParameter.visibility = View.GONE
+                    Toast.makeText(context, R.string.not_valid_value, Toast.LENGTH_SHORT).show()
                 }
             }
+            dialogBuilder.setNegativeButton(android.R.string.cancel, null)
+            dialogBuilder.show()
+        }
 
-            itemBinding.deleteBioParameter.setOnClickListener {
-                with(itemView.context){
-                    AlertDialog.Builder(this)
-                        .setTitle(R.string.are_you_shore)
-                        .setMessage(R.string.this_bio_parameter_will_be_permanently_deleted)
-                        .setPositiveButton(android.R.string.ok){_, _ ->
-                            val index = itemBinding.root.tag as Int
-                            callback.invoke(ViewEvent.DeleteBioParameter(bioParameter))
-                            bioParametersList.removeAt(index)
-                            notifyItemRemoved(index)
-                        }
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .show()
-                }
-            }
+        private fun addNewValue(value: String, bioParameter: BioParameter): BioParameterValue {
+            val newValue =
+                BioParameterValue(0L, bioParameter.id, Calendar.getInstance(), value.toDouble())
+            callback.invoke(ViewEvent.SaveBioParameterValue(newValue))
+            return newValue
         }
     }
-
-    private fun createSetValueDialog(context: Context, bioParameter: BioParameter, index: Int){
-        val layoutInflater = LayoutInflater.from(context)
-        val dialogView = layoutInflater.inflate(R.layout.item_set_new_bio_value_dialog,null)
-        val dialogBuilder = AlertDialog.Builder(context)
-        dialogBuilder.setView(dialogView)
-        val edittext = dialogView.findViewById<EditText>(R.id.input_text)
-
-        dialogBuilder.setPositiveButton(android.R.string.ok){_, _ ->
-            val newValuesText = edittext.text.toString()
-            if(newValuesText.isValidDouble()){
-                val newBioValue = addNewValue(newValuesText, bioParameter)
-                updateBioParameterInAdapter(bioParameter, newBioValue, index)
-            } else{
-                Toast.makeText(context, R.string.not_valid_value, Toast.LENGTH_SHORT).show()
-            }
-        }
-        dialogBuilder.setNegativeButton(android.R.string.cancel,null)
-        dialogBuilder.show()
-    }
-
-    private fun addNewValue(value: String, bioParameter: BioParameter): BioParameterValue
-    {
-        val newValue = BioParameterValue(0L, bioParameter.id, Calendar.getInstance(),value.toDouble())
-        callback.invoke(ViewEvent.SaveBioParameterValue(newValue))
-        return newValue
-    }
-
-    private fun updateBioParameterInAdapter(bioParameter: BioParameter, value: BioParameterValue, index: Int){
-        val values = bioParameter.values
-        val editedValues:MutableList<BioParameterValue> = values.toMutableList()
-        editedValues.add(value)
-        val updatedBioParameter = bioParameter.copy(values = editedValues)
-
-        bioParametersList.removeAt(index)
-        bioParametersList.add(index, updatedBioParameter)
-        notifyItemChanged(index)
-    }
-
-//    private fun setGraphData(bioValuesList: List<BioParameterValue>): List<Entry>{
-//        val xValues = ArrayList<String>()
-//        val listEntry = ArrayList<Entry>()
-//        bioValuesList.forEach { bioValue->
-//            xValues.add(bioValue.date.toText())
-//            val index = xValues.indexOf(bioValue.date.toText())
-//            val graphValue = bioValue.value.toFloat()
-//            listEntry.add(Entry(graphValue., index.toFloat()))
-//        }
-//        val lineDataSet = LineDataSet(listEntry,"")
-//        val data = LineData(lineDataSet)
-//    }
 }
-//class MyValueFormatter : ValueFormatter(){
-//    override fun getFormattedValue(value: Float): String {
-//        val calendar = Calendar.getInstance()
-//        calendar.timeInMillis = value.toLong()
-//        return calendar.toText()
-//    }
-//}
