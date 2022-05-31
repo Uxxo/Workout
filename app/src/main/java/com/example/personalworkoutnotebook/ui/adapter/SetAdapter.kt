@@ -1,7 +1,5 @@
 package com.example.personalworkoutnotebook.ui.adapter
 
-import android.text.InputFilter
-import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -71,6 +69,15 @@ class SetAdapter(
                 itemBinding.setRepeatsLayout.editText?.setText(set.repeat.toString())
             }
 
+            itemBinding.setMassEditText.setOnLongClickListener { it ->
+                val index = itemBinding.root.tag as Int
+                if (set.mass == 0.0 && index >0) {
+                    val previousSet = setList[index - 1]
+                    itemBinding.setMassLayout.editText?.setText(previousSet.mass.toShowIt())
+                    itemBinding.setMassEditText.clearFocus()
+                }
+                return@setOnLongClickListener true
+            }
 
             itemBinding.setRepeatsLayout.editText?.afterTextChanged { text ->
                     val index = itemBinding.root.tag as Int
@@ -81,6 +88,17 @@ class SetAdapter(
                     callback.invoke(ViewEvent.SaveSet(editedSet))
                     setList.removeAt(index)
                     setList.add(index, editedSet)
+            }
+
+            itemBinding.setRepeatsEditText.setOnLongClickListener { it ->
+                val index = itemBinding.root.tag as Int
+                if(set.repeat == 0 && index > 0){
+                    val previousSet = setList[index - 1]
+                    itemBinding.setRepeatsLayout.editText?.setText(previousSet.repeat.toString())
+                    itemBinding.setRepeatsEditText.clearFocus()
+                }
+
+                return@setOnLongClickListener true
             }
         }
     }

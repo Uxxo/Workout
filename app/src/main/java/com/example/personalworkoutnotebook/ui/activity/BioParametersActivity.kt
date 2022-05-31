@@ -32,25 +32,21 @@ class BioParametersActivity : AppCompatActivity() {
         binding = ActivityBioParametersBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.bioRecycler.adapter = BioParameterAdapter(mutableListOf(),this){   event ->
+        val adapter = BioParameterAdapter( this){ event ->
             when(event){
                 is ViewEvent.DeleteBioParameter ->lifecycleScope.launch { bioViewModel.deleteBioParameter(event.bioParameter) }
-                is ViewEvent.SaveBioParameterValue ->lifecycleScope.launch { bioViewModel.saveBioParametersValue(event.value) }
+                is ViewEvent.SaveBioParameterValue -> lifecycleScope.launch { bioViewModel.saveBioParametersValue(event.value) }
                 is ViewEvent.DeleteBioParameterValue ->lifecycleScope.launch { bioViewModel.deleteBioValue(event.value) }
+                is ViewEvent.StartBioParameterInfoActivity -> startActivity(event.intent)
             }
         }
 
         bioViewModel.allBioParameters.observe(this){ bioParameters ->
-            val adapter = BioParameterAdapter(bioParameters as MutableList<BioParameter>, this){ event ->
-                when(event){
-                    is ViewEvent.DeleteBioParameter ->lifecycleScope.launch { bioViewModel.deleteBioParameter(event.bioParameter) }
-                    is ViewEvent.SaveBioParameterValue -> lifecycleScope.launch { bioViewModel.saveBioParametersValue(event.value) }
-                    is ViewEvent.DeleteBioParameterValue ->lifecycleScope.launch { bioViewModel.deleteBioValue(event.value) }
-                }
-            }
+            println()
             binding.bioRecycler.adapter = adapter
-            adapter.notifyDataSetChanged()
+            adapter.setBioParameters(bioParameters)
         }
+
 
         binding.addNewBioParameter.setOnClickListener {
             createBioParameterDialog()
@@ -71,7 +67,7 @@ class BioParametersActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         lifecycleScope.launch {
-            bioViewModel.getAllBioParameters()
+            bioViewModel.loadAllBioParameters()
         }
     }
 
@@ -89,7 +85,7 @@ class BioParametersActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     val bioParameterId = bioViewModel.createBioParameter(editTitle)
                     bioViewModel.createNewBioValue(editValue.toDouble(), bioParameterId)
-                    bioViewModel.getAllBioParameters()
+                    bioViewModel.loadAllBioParameters()
                 }
             } else{
                 Toast.makeText(this, "Bio parameters is not valid", Toast.LENGTH_SHORT).show()

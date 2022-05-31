@@ -1,6 +1,5 @@
 package com.example.personalworkoutnotebook.ui.viewModel
 
-import android.widget.EditText
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -27,12 +26,26 @@ class BioParameterViewModel @Inject constructor(
     val allBioParameters: LiveData<List<BioParameter>>
         get() = _allBioParameters
 
+    private var _bioParameter = MutableLiveData<BioParameter>()
+    val bioParameter: LiveData<BioParameter>
+        get() = _bioParameter
 
-    suspend fun getAllBioParameters(){
+
+    suspend fun loadAllBioParameters(){
+        println()
         _isLoading.value = true
         val parametersList = bioParameterRepository.getAll()
         _allBioParameters.value = parametersList
         _isLoading.value = false
+    }
+
+    suspend fun loadBioParameter(bioParameterId : Long){
+        println()
+        val bioParameter = bioParameterRepository.getById(bioParameterId)
+        if(bioParameter != null){
+            println()
+            _bioParameter.value = bioParameter!!
+        }
     }
 
     suspend fun saveBioParameter(bioParameter: BioParameter){
@@ -41,6 +54,7 @@ class BioParameterViewModel @Inject constructor(
 
     suspend fun saveBioParametersValue(value: BioParameterValue){
         valueRepository.save(value)
+        loadAllBioParameters()
     }
 
     suspend fun createBioParameter(name: String): Long {
@@ -50,6 +64,7 @@ class BioParameterViewModel @Inject constructor(
 
     suspend fun deleteBioParameter(bioParameter: BioParameter){
         bioParameterRepository.delete(bioParameter)
+
     }
 
     suspend fun createNewBioValue(value: Double, bioParamId: Long){
@@ -60,5 +75,6 @@ class BioParameterViewModel @Inject constructor(
 
     suspend fun deleteBioValue(value: BioParameterValue){
         valueRepository.delete(value)
+        loadBioParameter(value.bioParameterId)
     }
 }

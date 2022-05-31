@@ -7,11 +7,8 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.personalworkoutnotebook.model.*
 import com.example.personalworkoutnotebook.model.Set
-import com.example.personalworkoutnotebook.model.Exercise
-import com.example.personalworkoutnotebook.model.Group
-import com.example.personalworkoutnotebook.model.WorkoutTimer
-import com.example.personalworkoutnotebook.model.Workout
 import com.example.personalworkoutnotebook.repository.SetRepository
 import com.example.personalworkoutnotebook.repository.ExerciseRepository
 import com.example.personalworkoutnotebook.repository.WorkoutTimerRepository
@@ -51,12 +48,16 @@ class WorkoutViewModel @Inject constructor(
         get() = _workout
 
     private var _exercise = MutableLiveData<Exercise>()
-    val exercise:LiveData<Exercise>
+    val exercise: LiveData<Exercise>
         get() = _exercise
 
-    private var _exercisesGraphData = MutableLiveData<Map<Calendar, Double>>()
-    val exerciseGraphData:LiveData<Map<Calendar, Double>>
-        get() = _exercisesGraphData
+    private var _exercisesWithDates = MutableLiveData <List<ExerciseWithDate>>()
+    val exerciseWithDate: LiveData<List<ExerciseWithDate>>
+        get() = _exercisesWithDates
+
+//    private var _exercisesGraphData = MutableLiveData<Map<Calendar, Double>>()
+//    val exerciseGraphData: LiveData<Map<Calendar, Double>>
+//        get() = _exercisesGraphData
 
     private var _groups = MutableLiveData<List<Group>>()
     val groups: LiveData<List<Group>>
@@ -79,7 +80,7 @@ class WorkoutViewModel @Inject constructor(
 
     }
 
-    suspend fun loadExerciseById(id: Long){
+    suspend fun loadExerciseById(id: Long) {
         _exercise.value = exerciseRepository.getById(id)
     }
 
@@ -87,7 +88,7 @@ class WorkoutViewModel @Inject constructor(
         workoutRepository.save(newWorkout)
     }
 
-    suspend fun updateWorkout(newWorkout: Workout){
+    suspend fun updateWorkout(newWorkout: Workout) {
         saveWorkout(newWorkout)
         updateWorkoutValue(newWorkout.id)
     }
@@ -101,23 +102,25 @@ class WorkoutViewModel @Inject constructor(
             timers = mutableListOf()
         )
         val createdWorkout = workoutRepository.save(newWorkout)
-         addNewTimersToWorkout(createdWorkout.id)
-         return createdWorkout
+        addNewTimersToWorkout(createdWorkout.id)
+        return createdWorkout
     }
 
-    suspend fun duplicateWorkout(workout: Workout){
+    suspend fun duplicateWorkout(workout: Workout) {
         val newWorkout = createWorkout()
-        val editedWorkout = workout.copy(id = newWorkout.id, exercises = mutableListOf(),
-                                        date = newWorkout.date, status = newWorkout.status)
+        val editedWorkout = workout.copy(
+            id = newWorkout.id, exercises = mutableListOf(),
+            date = newWorkout.date, status = newWorkout.status
+        )
 
         saveWorkout(editedWorkout)
 
         val originExercises = workout.exercises
         originExercises.forEach { exercise ->
-           val newExerciseId = saveExercise(exercise.copy(id = 0, workoutId = newWorkout.id))
+            val newExerciseId = saveExercise(exercise.copy(id = 0, workoutId = newWorkout.id))
 
             exercise.sets.forEach { set ->
-               saveSet(set.copy(id = 0, exerciseId = newExerciseId, repeat = 0 ))
+                saveSet(set.copy(id = 0, exerciseId = newExerciseId, repeat = 0))
             }
         }
         loadAllWorkouts()
@@ -143,7 +146,7 @@ class WorkoutViewModel @Inject constructor(
         return listOf(newTimer1, newTimer2)
     }
 
-    private fun createTimer(workoutId: Long) : WorkoutTimer{
+    private fun createTimer(workoutId: Long): WorkoutTimer {
         return WorkoutTimer(
             id = 0L,
             workoutId = workoutId,
@@ -152,17 +155,17 @@ class WorkoutViewModel @Inject constructor(
         )
     }
 
-    suspend fun saveTimer(timer : WorkoutTimer){
+    suspend fun saveTimer(timer: WorkoutTimer) {
         timerRepository.save(timer)
         updateWorkoutValue(timer.workoutId)
     }
 
-    private suspend fun loadAllExercises():List<Exercise?> {
+    private suspend fun loadAllExercises(): List<Exercise?> {
         allExercise = exerciseRepository.getAll()
         return allExercise
     }
 
-    suspend fun getUniqueExercises(){
+    suspend fun getUniqueExercises() {
         val exercises = loadAllExercises()
         val uniqueExercises = WorkoutDataService().getUniqueExercisesWithMaxMass(exercises)
         _uniqueExercises.value = uniqueExercises
@@ -200,6 +203,29 @@ class WorkoutViewModel @Inject constructor(
         _isLoading.postValue(false)
     }
 
+    suspend fun getExerciseWithDateByNameAndGroup(exerciseName: String?, exerciseGroup: String?){
+        val resultList = mutableListOf<ExerciseWithDate>()
+        val allWorkouts = workoutRepository.getAll()
+
+        allWorkouts.forEach { workout ->
+            workout.exercises.forEach { exercise ->
+                if (exercise.name.equals(exerciseName) && exercise.group.equals(exerciseGroup)) {
+                    val resultExercise = ExerciseWithDate(
+                        exercise.id,
+                        exercise.workoutId,
+                        workout.date,
+                        exercise.name,
+                        exercise.notes,
+                        exercise.group,
+                        exercise.sets
+                    )
+                    resultList.add(resultExercise)
+                }
+            }
+        }
+        _exercisesWithDates.value = resultList
+    }
+
     private fun createNewSet(exerciseId: Long): Set {
         return Set(id = 0L, exerciseId = exerciseId, mass = 0.0, repeat = 0)
     }
@@ -208,18 +234,34 @@ class WorkoutViewModel @Inject constructor(
         return exerciseRepository.save(exercise).id
     }
 
-    suspend fun loadExercisesDataForGraphic(id: Long){
-        val exercise = exerciseRepository.getById(id) ?: return
-        if(exercise.name == null) return
-        val exerciseList = if (exercise.group != null) {
-            exerciseRepository.getExerciseByName(exercise.name, exercise.group)
-        } else {
-            exerciseRepository.getExerciseByName(exercise.name, "")
+    suspend fun renameExercises(exerciseId: Long, incomingTitle: String, incomingGroup: String){
+        val oldExercise = exerciseRepository.getById(exerciseId) ?: return
+        val allExercisesList = exerciseRepository.getAll()
+       allExercisesList.forEach { exercise ->
+           println()
+            if(exercise?.name == oldExercise.name && exercise?.group == oldExercise.group ){
+                val newGroup = if (incomingGroup == "") null
+                                else incomingGroup
+                val exerciseForUpdate = exercise!!.copy(name = incomingTitle, group = newGroup)
+                exerciseRepository.save(exerciseForUpdate)
+            }
         }
-        val allWorkouts = workoutRepository.getAll()
-
-        _exercisesGraphData.value = WorkoutDataService().getExercisesInfoForGraphic(exerciseList, allWorkouts)
+        loadExerciseById(exerciseId)
     }
+
+//    suspend fun loadExercisesDataForGraphic(id: Long) {
+//        val exercise = exerciseRepository.getById(id) ?: return
+//        if (exercise.name == null) return
+//        val exerciseList = if (exercise.group != null) {
+//            exerciseRepository.getExerciseByName(exercise.name, exercise.group)
+//        } else {
+//            exerciseRepository.getExerciseByName(exercise.name, "")
+//        }
+//        val allWorkouts = workoutRepository.getAll()
+//
+//        _exercisesGraphData.value =
+//            WorkoutDataService().getExercisesInfoForGraphic(exerciseList, allWorkouts)
+//    }
 
     suspend fun saveSet(set: Set) {
         setRepository.save(set)
@@ -240,19 +282,19 @@ class WorkoutViewModel @Inject constructor(
         _isLoading.postValue(false)
     }
 
-    suspend fun copyWorkoutToBuffer(workoutId: Long, context: Context){
+    suspend fun copyWorkoutToBuffer(workoutId: Long, context: Context) {
         val findWorkout = workoutRepository.getById(workoutId) ?: return
         val outputString = WorkoutDataService().workoutAsString(findWorkout)
 
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Workout", outputString)
         clipboard.setPrimaryClip(clip)
-        Toast.makeText( context,"Workout copied to buffer", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Workout copied to buffer", Toast.LENGTH_SHORT).show()
     }
 
-    suspend fun loadAllExercisesGroup(context: Context){
+    suspend fun loadAllExercisesGroup(context: Context) {
         val exercises = exerciseRepository.getAll()
-        _groups.value = WorkoutDataService().getGroupList(context,exercises)
+        _groups.value = WorkoutDataService().getGroupList(context, exercises)
     }
 
 }

@@ -2,6 +2,9 @@ package com.example.personalworkoutnotebook.model
 
 import androidx.room.*
 import com.example.personalworkoutnotebook.extension.toFirstUpperCase
+import com.example.personalworkoutnotebook.extension.toShowIt
+import com.example.personalworkoutnotebook.extension.toText
+import java.util.*
 import kotlin.math.max
 
 data class Exercise(
@@ -35,9 +38,9 @@ data class RoomExerciseWithSet(
 
 fun Exercise.toRoom() = RoomExercise(
     id = this.id,
-    name = this.name?.toFirstUpperCase(),
+    name = this.name?.toFirstUpperCase()?.trim(),
     notes = this.notes,
-    group = this.group?.toFirstUpperCase(),
+    group = this.group?.toFirstUpperCase()?.trim(),
     workoutId = this.workoutId
 )
 
@@ -49,7 +52,6 @@ fun RoomExerciseWithSet.toModel(): Exercise = Exercise(
     group = this.exercise.group,
     sets = this.sets.map { it.toModel() }
 )
-
 
 
 fun Exercise.getMaxMass(): Double{
@@ -71,4 +73,74 @@ fun Exercise.getMaxRepeat(incomingMass:Double): Int{
     }
     return maxRepeat
 }
+
+fun Exercise.getActualMassAsString(): String {
+    if (this.sets.isEmpty()) return ""
+    var returnedString = ""
+    var maxMass = this.sets[0].mass
+    var repeat = this.sets[0].repeat
+    this.sets.forEach { set ->
+        if (set.mass > maxMass && set.repeat != 0) {
+            maxMass = set.mass
+            repeat = set.repeat
+        }
+    }
+
+    if (repeat != 0) {
+        val resultMass =
+            if (maxMass - maxMass.toInt() == 0.0) maxMass.toInt()
+            else maxMass
+        returnedString = "$resultMass: /$repeat"
+    }
+    return returnedString
+}
+
+fun Exercise.setsAsString(): String{
+    var resultString = ""
+
+    this.sets.forEach {
+        val index = sets.indexOf(it)
+        var mass = ""
+        if (index == 0) mass = it.mass.toShowIt() + ":"
+        if(index > 0 && it.mass != sets[index-1].mass && it.mass !=0.0) {
+            mass = "\n"+ it.mass.toShowIt() + ":"
+        }
+        val repeat = if(it.repeat !=0) {" /${it.repeat}"}
+        else{""}
+        resultString += mass + repeat
+    }
+    return resultString
+}
+
+data class ExerciseWithDate(
+    val id: Long = 0L,
+    val workoutId: Long,
+    val date:Calendar,
+    val name: String?,
+    val notes: String?,
+    val group: String?,
+    val sets: List<Set> = listOf()
+)
+
+fun ExerciseWithDate.setsToString(): String {
+    var resultString = ""
+    var previousMass = 0.0
+
+    this.sets.forEach { set ->
+        if (set.repeat != 0){
+            val mass = set.mass
+            val repeats = set.repeat
+
+            if(mass == previousMass) {
+                resultString += "/$repeats"
+                previousMass = mass
+            }
+            else resultString += "   ${mass.toShowIt()}/$repeats"
+            previousMass = mass
+        }
+    }
+    return resultString
+}
+
+
 

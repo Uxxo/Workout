@@ -9,8 +9,7 @@ import com.example.personalworkoutnotebook.model.Set
 import com.example.personalworkoutnotebook.model.Exercise
 
 class ExercisePresentationAdapter(
-    private var exerciseList: MutableList<Exercise>,
-
+    private var exerciseList: MutableList<Exercise>
 ) :
     RecyclerView.Adapter<ExercisePresentationAdapter.ExercisePresentationHolder>() {
 
@@ -40,7 +39,6 @@ class ExercisePresentationAdapter(
 
     inner class ExercisePresentationHolder(private val exerciseBinding: ItemExercisePresentationBinding) :
         RecyclerView.ViewHolder(exerciseBinding.root) {
-
 
         fun bind(exercise: Exercise) {
             exerciseBinding.exerciseTitle.text = exercise.name

@@ -7,19 +7,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.personalworkoutnotebook.R
 import com.example.personalworkoutnotebook.databinding.ItemExerciseBinding
 import com.example.personalworkoutnotebook.databinding.ItemExercisePresentationBinding
 import com.example.personalworkoutnotebook.extension.afterTextChanged
+import com.example.personalworkoutnotebook.extension.toShowIt
+import com.example.personalworkoutnotebook.model.*
 import com.example.personalworkoutnotebook.model.Set
-import com.example.personalworkoutnotebook.model.Exercise
-import com.example.personalworkoutnotebook.model.Workout
-import com.example.personalworkoutnotebook.model.getMaxMass
 import com.example.personalworkoutnotebook.ui.ViewEvent
 import com.example.personalworkoutnotebook.ui.activity.ExerciseInfoActivity
 import com.example.personalworkoutnotebook.ui.adapter.HolderTypeConstants.GROUP_EXERCISE_HOLDER
 import com.example.personalworkoutnotebook.ui.adapter.HolderTypeConstants.WORKOUT_EXERCISE_HOLDER
+import javax.xml.parsers.DocumentBuilder
 
 class ExerciseAdapter(
     private val context: Context,
@@ -41,13 +43,13 @@ class ExerciseAdapter(
         notifyDataSetChanged()
     }
 
-    fun setUniqueExercises(incomingExercises: List<Exercise>){
+    fun setUniqueExercises(incomingExercises: List<Exercise>) {
         uniqueExercisesList = incomingExercises as MutableList<Exercise>
         println()
         notifyDataSetChanged()
     }
 
-    fun setWorkoutStatus(incomingStatus: Int){
+    fun setWorkoutStatus(incomingStatus: Int) {
         workoutStatus = incomingStatus
         notifyDataSetChanged()
     }
@@ -152,7 +154,7 @@ class ExerciseAdapter(
                             if (exerciseBinding.setRecycler.visibility == View.VISIBLE) {
 
                                 setAdapter.setSetList(editedExercise.sets)
-                                exerciseBinding.setRecycler.smoothScrollToPosition(setAdapter.itemCount -1)
+                                exerciseBinding.setRecycler.smoothScrollToPosition(setAdapter.itemCount - 1)
                             }
                             exerciseBinding.exerciseGroup.visibility = View.VISIBLE
                         }
@@ -171,12 +173,14 @@ class ExerciseAdapter(
                 exerciseBinding.exerciseName.editText?.setText("")
             }
             exerciseBinding.exerciseName.editText?.afterTextChanged { text ->
-                if(exerciseBinding.exerciseName.editText?.text.toString() != exercise.name){
+                if (exerciseBinding.exerciseName.editText?.text.toString() != exercise.name) {
                     if (!onBind) {
-                        if (text.length > 10) exerciseBinding.exerciseGroup.visibility = View.VISIBLE
+                        if (text.length > 10) exerciseBinding.exerciseGroup.visibility =
+                            View.VISIBLE
                         val index = exerciseBinding.root.tag as Int
-                        val editedExercise = if(text.isEmpty()) exerciseList[index].copy( name = null)
-                        else  exerciseList[index].copy(name = text)
+                        val editedExercise =
+                            if (text.isEmpty()) exerciseList[index].copy(name = null)
+                            else exerciseList[index].copy(name = text)
                         callback.invoke(ViewEvent.SaveExercise(editedExercise))
 
                         exerciseList.removeAt(index)
@@ -185,14 +189,14 @@ class ExerciseAdapter(
                 }
             }
 
-            if(exercise.group != null ) {
+            if (exercise.group != null) {
                 exerciseBinding.exerciseGroup.editText?.setText(exercise.group)
             } else {
                 exerciseBinding.exerciseGroup.editText?.setText("")
             }
 
             exerciseBinding.exerciseGroup.editText?.afterTextChanged { text ->
-                if(exerciseBinding.exerciseGroup.editText?.text.toString() != exercise.group) {
+                if (exerciseBinding.exerciseGroup.editText?.text.toString() != exercise.group) {
                     if (!onBind) {
                         val index = exerciseBinding.root.tag as Int
                         val editedExercise = if (text != "") exerciseList[index].copy(group = text)
@@ -208,7 +212,7 @@ class ExerciseAdapter(
             if (workoutStatus == Workout.IN_PROCESS) {
                 exerciseBinding.setRecycler.adapter = setAdapter
                 setAdapter.setSetList(exercise.sets)
-                exerciseBinding.setRecycler.smoothScrollToPosition(exercise.sets.size -1)
+                exerciseBinding.setRecycler.smoothScrollToPosition(exercise.sets.size - 1)
 
                 exerciseBinding.addSet.setOnClickListener {
                     callback.invoke(ViewEvent.AddSetToExercise(exercise))
@@ -240,11 +244,11 @@ class ExerciseAdapter(
                 it.visibility = View.GONE
             }
 
-            if(exercise.notes != exerciseBinding.exerciseNote.editText?.text.toString()){
+            if (exercise.notes != exerciseBinding.exerciseNote.editText?.text.toString()) {
                 exerciseBinding.exerciseNote.editText?.setText(exercise.notes)
             }
             exerciseBinding.exerciseNote.editText?.afterTextChanged { text ->
-                if(text != exercise.notes){
+                if (text != exercise.notes) {
                     if (!onBind) {
                         val index = exerciseBinding.root.tag as Int
                         val editedExercise = exerciseList[index].copy(notes = text)
@@ -274,7 +278,8 @@ class ExerciseAdapter(
 
         fun bind(exercise: Exercise) {
             exerciseBinding.exerciseTitle.text = exercise.name
-            exerciseBinding.setsInf.text = getExerciseMaxMass(exercise)
+
+            exerciseBinding.setsInf.text = exercise.getActualMassAsString()
 
             exerciseBinding.exerciseTitle.setOnClickListener {
                 val intent = ExerciseInfoActivity.getIntent(context, exercise.id)
@@ -284,32 +289,13 @@ class ExerciseAdapter(
 
     }
 
-    private fun getExerciseMaxMass(exercise: Exercise): String {
-        if (exercise.sets.isEmpty()) return ""
-        var returnedString = ""
-        var maxMass = exercise.sets[0].mass
-        var repeat = exercise.sets[0].repeat
-        exercise.sets.forEach { set ->
-            if (set.mass > maxMass && set.repeat != 0) {
-                maxMass = set.mass
-                repeat = set.repeat
-            }
-        }
-
-        if (repeat != 0) {
-            val resultMass =
-                if (maxMass - maxMass.toInt() == 0.0) maxMass.toInt()
-                else maxMass
-            returnedString = "$resultMass: /$repeat"
-        }
-        return returnedString
-    }
 
     private fun getExercisesTitleAndGroup(exercises: List<Exercise>): List<String> {
         val resultList = mutableListOf<String>()
         exercises.forEach { exercise ->
             if (exercise.name != null) {
-                val outputString = "${exercise.name} (${exercise.group ?: context.getString(R.string.group_other)})"
+                val outputString =
+                    "${exercise.name} (${exercise.group ?: context.getString(R.string.group_other)})"
                 resultList.add(exercises.indexOf(exercise), outputString)
                 exercisesMap[outputString] = exercise
             }
@@ -317,8 +303,10 @@ class ExerciseAdapter(
         return resultList
     }
 
-    private fun updateExercise(exerciseForUpdate: Exercise, newName: String?, newGroup: String?,
-                               maxMass: Double): Exercise {
+    private fun updateExercise(
+        exerciseForUpdate: Exercise, newName: String?, newGroup: String?,
+        maxMass: Double
+    ): Exercise {
         val setsList = exerciseForUpdate.sets
         val newSetsList = mutableListOf<Set>()
 
@@ -337,7 +325,6 @@ class ExerciseAdapter(
             sets = newSetsList
         )
     }
-
 }
 
 object HolderTypeConstants {

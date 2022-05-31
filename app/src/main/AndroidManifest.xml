@@ -42,6 +42,11 @@
         <activity
             android:name=".ui.activity.BioParametersActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".ui.activity.BioParameterInfoActivity"
+            android:screenOrientation="portrait"
+            />
+
+
     </application>
 
 </manifest>
