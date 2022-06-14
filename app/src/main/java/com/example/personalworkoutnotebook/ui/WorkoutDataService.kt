@@ -9,14 +9,14 @@ import java.util.*
 
 class WorkoutDataService {
 
-    fun getGroupList(context: Context, exerciseList: List<Exercise?>): List<Group> {
+    fun getGroupList(groupOtherName: String, exerciseList: List<Exercise?>): List<Group> {
 
         val groupMap: MutableMap<String, MutableMap<String, Exercise>> = mutableMapOf()
 
         exerciseList.forEach { exercise ->
             if (exercise?.name != null) {
                 val incomingExercise =
-                    if (exercise.group == null) exercise.copy(group = context.getString(R.string.group_other))
+                    if (exercise.group == null) exercise.copy(group = groupOtherName)
                     else exercise
                 if (groupMap.containsKey(incomingExercise.group?.trim())) {
                     val exerciseMap = groupMap[incomingExercise.group?.trim()]

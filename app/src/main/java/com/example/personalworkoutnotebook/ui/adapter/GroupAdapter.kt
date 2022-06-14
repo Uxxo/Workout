@@ -11,7 +11,6 @@ import com.example.personalworkoutnotebook.model.Workout
 import com.example.personalworkoutnotebook.ui.ViewEvent
 
 class GroupAdapter(
-    private val context: Context,
     private val callback: (event: ViewEvent) -> Unit
 ) : RecyclerView.Adapter<GroupAdapter.GroupHolder>() {
 
@@ -48,7 +47,7 @@ class GroupAdapter(
 
         fun bind(group: Group) {
 
-            val exerciseAdapter = ExerciseAdapter(context,HolderTypeConstants.GROUP_EXERCISE_HOLDER,callback)
+            val exerciseAdapter = ExerciseAdapter(HolderTypeConstants.GROUP_EXERCISE_HOLDER,callback)
             exerciseAdapter.setExercises(group.exerciseList)
             groupBinding.exerciseRecycler.adapter = exerciseAdapter
             groupBinding.exerciseRecycler.visibility = View.GONE

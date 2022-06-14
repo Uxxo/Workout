@@ -10,5 +10,7 @@
     <color name="my_background_1">#163F6AB5</color>
     <color name="text_color">#8A8A8A</color>
     <color name="icons_color">#424242</color>
+    <color name="button_text_color">#8A8A8A</color>
+    <color name="blue_icon_color">#005CCC</color>
 
 </resources>

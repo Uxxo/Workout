@@ -19,18 +19,6 @@
         tools:text="Exercise Title"
         />
 
-<!--    <ImageButton-->
-<!--        android:id="@+id/rename_exercise"-->
-<!--        android:src="@drawable/ic_pencil"-->
-<!--        style="@style/Widget.MaterialComponents.FloatingActionButton"-->
-<!--        android:paddingEnd="8dp"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="@id/exerciseTitle"-->
-<!--        tools:ignore="RtlSymmetry"-->
-<!--        android:visibility="gone"/>-->
-
     <TextView
         android:id="@+id/setsInf"
         android:layout_width="match_parent"

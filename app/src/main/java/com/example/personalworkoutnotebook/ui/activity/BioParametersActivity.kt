@@ -32,7 +32,7 @@ class BioParametersActivity : AppCompatActivity() {
         binding = ActivityBioParametersBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val adapter = BioParameterAdapter( this){ event ->
+        val adapter = BioParameterAdapter( ){ event ->
             when(event){
                 is ViewEvent.DeleteBioParameter ->lifecycleScope.launch { bioViewModel.deleteBioParameter(event.bioParameter) }
                 is ViewEvent.SaveBioParameterValue -> lifecycleScope.launch { bioViewModel.saveBioParametersValue(event.value) }

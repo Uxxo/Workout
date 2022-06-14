@@ -292,9 +292,9 @@ class WorkoutViewModel @Inject constructor(
         Toast.makeText(context, "Workout copied to buffer", Toast.LENGTH_SHORT).show()
     }
 
-    suspend fun loadAllExercisesGroup(context: Context) {
+    suspend fun loadAllExercisesGroup(groupOtherName: String) {
         val exercises = exerciseRepository.getAll()
-        _groups.value = WorkoutDataService().getGroupList(context, exercises)
+        _groups.value = WorkoutDataService().getGroupList(groupOtherName, exercises)
     }
 
 }

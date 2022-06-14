@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.personalworkoutnotebook.R
 import com.example.personalworkoutnotebook.databinding.ActivityExercisesBinding
 import com.example.personalworkoutnotebook.model.Group
 import com.example.personalworkoutnotebook.ui.ViewEvent
@@ -26,7 +27,7 @@ class ExercisesActivity : AppCompatActivity() {
         binding = ActivityExercisesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val groupAdapter = GroupAdapter(this)
+        val groupAdapter = GroupAdapter()
         { event ->
             when(event){
                 is ViewEvent.StartExerciseInfoActivity -> startActivity(event.intent)
@@ -52,9 +53,8 @@ class ExercisesActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-
         lifecycleScope.launch {
-            workoutViewModel.loadAllExercisesGroup(this@ExercisesActivity)
+            workoutViewModel.loadAllExercisesGroup(this@ExercisesActivity.getString(R.string.group_other))
         }
 
     }

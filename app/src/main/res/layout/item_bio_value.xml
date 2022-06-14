@@ -51,6 +51,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:src="@drawable/ic_delete"
         android:paddingEnd="2dp"
-        app:tint="@color/icons_color" />
+        app:tint="@color/icons_color"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -139,18 +139,4 @@ class WorkoutPresentationAdapter(
 
         }
     }
-
-//    private fun createVisibilityList(): MutableList<Boolean>{
-//        val visibilityList = mutableListOf<Boolean>()
-//        for ( i in 0 until workoutList.size){
-//            visibilityList.add(false)
-//        }
-//        return visibilityList
-//    }
-
-//    private fun changeVisibility(index : Int){
-//        val visibility = visibilityList[index]
-//        visibilityList[index] = !visibility
-//    }
-
 }

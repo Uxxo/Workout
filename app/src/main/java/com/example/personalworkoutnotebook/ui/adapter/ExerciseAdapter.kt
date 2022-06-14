@@ -24,7 +24,6 @@ import com.example.personalworkoutnotebook.ui.adapter.HolderTypeConstants.WORKOU
 import javax.xml.parsers.DocumentBuilder
 
 class ExerciseAdapter(
-    private val context: Context,
     private val holderType: Int,
     private val callback: (event: ViewEvent) -> Unit
 ) :
@@ -103,7 +102,7 @@ class ExerciseAdapter(
         RecyclerView.ViewHolder(exerciseBinding.root) {
 
         fun bind(exercise: Exercise) {
-
+            val context = exerciseBinding.root.context
             val setAdapter = SetAdapter(callback)
 
             exerciseBinding.root.tag = exerciseList.indexOf(exercise)
@@ -127,7 +126,7 @@ class ExerciseAdapter(
 
 
             val autoCompleteTextView = exerciseBinding.exerciseNameEditText
-            val namesList = getExercisesTitleAndGroup(uniqueExercisesList)
+            val namesList = getExercisesTitleAndGroup(context ,uniqueExercisesList)
             val uniqueExercisesAdapter =
                 ArrayAdapter(context, R.layout.support_simple_spinner_dropdown_item, namesList)
             autoCompleteTextView.setAdapter(uniqueExercisesAdapter)
@@ -277,6 +276,7 @@ class ExerciseAdapter(
         RecyclerView.ViewHolder(exerciseBinding.root) {
 
         fun bind(exercise: Exercise) {
+            val context = exerciseBinding.root.context
             exerciseBinding.exerciseTitle.text = exercise.name
 
             exerciseBinding.setsInf.text = exercise.getActualMassAsString()
@@ -290,7 +290,7 @@ class ExerciseAdapter(
     }
 
 
-    private fun getExercisesTitleAndGroup(exercises: List<Exercise>): List<String> {
+    private fun getExercisesTitleAndGroup(context: Context, exercises: List<Exercise>): List<String> {
         val resultList = mutableListOf<String>()
         exercises.forEach { exercise ->
             if (exercise.name != null) {

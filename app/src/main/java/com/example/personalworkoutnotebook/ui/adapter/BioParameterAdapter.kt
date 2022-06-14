@@ -29,7 +29,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class BioParameterAdapter(
-    private val context: Context,
     private val callback: (event: ViewEvent) -> Unit
 ) :
     RecyclerView.Adapter<BioParameterAdapter.BioParametersHolder>() {
@@ -59,8 +58,7 @@ class BioParameterAdapter(
 
     inner class BioParametersHolder(private val itemBinding: ItemBioParameterBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
-
-        private val valueAdapter = BioValueAdapter(callback)
+        private val context = itemBinding.root.context
 
         fun bind(bioParameter: BioParameter) {
 

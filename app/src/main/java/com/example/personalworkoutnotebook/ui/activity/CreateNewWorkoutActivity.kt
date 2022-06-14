@@ -77,7 +77,7 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
         setContentView(binding.root)
 
 
-        val exerciseAdapter = ExerciseAdapter(this,HolderTypeConstants.WORKOUT_EXERCISE_HOLDER){ event ->
+        val exerciseAdapter = ExerciseAdapter(HolderTypeConstants.WORKOUT_EXERCISE_HOLDER){ event ->
             when (event) {
                 is ViewEvent.SaveSet -> lifecycleScope.launch {
                     workoutViewModel.saveSet(event.set) }
