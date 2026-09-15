@@ -31,6 +31,7 @@ class ExercisesActivity : AppCompatActivity() {
         { event ->
             when(event){
                 is ViewEvent.StartExerciseInfoActivity -> startActivity(event.intent)
+                else ->{}
             }
         }
 

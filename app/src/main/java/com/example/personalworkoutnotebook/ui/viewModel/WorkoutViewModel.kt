@@ -3,7 +3,9 @@ package com.example.personalworkoutnotebook.ui.viewModel
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -282,6 +284,7 @@ class WorkoutViewModel @Inject constructor(
         _isLoading.postValue(false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.HONEYCOMB)
     suspend fun copyWorkoutToBuffer(workoutId: Long, context: Context) {
         val findWorkout = workoutRepository.getById(workoutId) ?: return
         val outputString = WorkoutDataService().workoutAsString(findWorkout)

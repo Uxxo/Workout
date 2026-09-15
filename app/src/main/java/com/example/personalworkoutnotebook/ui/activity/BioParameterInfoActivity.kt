@@ -49,7 +49,7 @@ class BioParameterInfoActivity : AppCompatActivity() {
                     bioViewModel.deleteBioValue(
                         event.value
                     )
-                }
+                } else -> {}
             }
         }
 

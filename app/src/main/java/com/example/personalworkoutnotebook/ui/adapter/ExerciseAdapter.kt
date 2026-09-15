@@ -128,7 +128,7 @@ class ExerciseAdapter(
             val autoCompleteTextView = exerciseBinding.exerciseNameEditText
             val namesList = getExercisesTitleAndGroup(context ,uniqueExercisesList)
             val uniqueExercisesAdapter =
-                ArrayAdapter(context, R.layout.support_simple_spinner_dropdown_item, namesList)
+                ArrayAdapter(context,android.R.layout.simple_spinner_dropdown_item, namesList)
             autoCompleteTextView.setAdapter(uniqueExercisesAdapter)
             autoCompleteTextView.threshold = 2
             autoCompleteTextView.onItemClickListener =

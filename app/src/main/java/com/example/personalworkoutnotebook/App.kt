@@ -9,6 +9,8 @@ class App: Application() {
 
     override fun onCreate() {
         super.onCreate()
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+            androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO)
         DbModule.initDb(applicationContext)
     }
 }

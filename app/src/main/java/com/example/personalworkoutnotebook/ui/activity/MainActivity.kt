@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
                 is ViewEvent.DeleteWorkout -> lifecycleScope.launch { workoutViewModel.deleteWorkout(event.workout) }
                 is ViewEvent.DuplicateWorkout -> lifecycleScope.launch { workoutViewModel.duplicateWorkout(event.workout) }
                 is ViewEvent.CopyWorkoutsFields -> lifecycleScope.launch { workoutViewModel.copyWorkoutToBuffer(event.workout.id,this@MainActivity) }
+                else ->{}
             }
         }
 

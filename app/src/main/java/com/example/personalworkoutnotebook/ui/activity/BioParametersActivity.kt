@@ -38,6 +38,7 @@ class BioParametersActivity : AppCompatActivity() {
                 is ViewEvent.SaveBioParameterValue -> lifecycleScope.launch { bioViewModel.saveBioParametersValue(event.value) }
                 is ViewEvent.DeleteBioParameterValue ->lifecycleScope.launch { bioViewModel.deleteBioValue(event.value) }
                 is ViewEvent.StartBioParameterInfoActivity -> startActivity(event.intent)
+                else ->{}
             }
         }
 

@@ -1,17 +1,15 @@
 package com.example.personalworkoutnotebook.ui.activity
 
-import android.app.Activity
+
 import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -19,7 +17,7 @@ import com.example.personalworkoutnotebook.R
 import com.example.personalworkoutnotebook.databinding.ActivityCreateWorkoutBinding
 import com.example.personalworkoutnotebook.extension.*
 import com.example.personalworkoutnotebook.model.*
-import com.example.personalworkoutnotebook.service.CountDownService
+import com.example.personalworkoutnotebook.service.CountDownServiceII
 import com.example.personalworkoutnotebook.ui.ViewEvent
 import com.example.personalworkoutnotebook.ui.adapter.ExerciseAdapter
 import com.example.personalworkoutnotebook.ui.adapter.HolderTypeConstants
@@ -85,9 +83,9 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                 is ViewEvent.SaveExercise -> lifecycleScope.launch { workoutViewModel.saveExercise(event.exercise) }
                 is ViewEvent.DeleteExercise -> lifecycleScope.launch { workoutViewModel.deleteExercise(event.exercise.id) }
                 is ViewEvent.AddSetToExercise -> lifecycleScope.launch { workoutViewModel.addSetToExercise(event.exercise.id) }
+                else ->{}
             }
         }
-
 
         workoutViewModel.workout.observe(this) { workout ->
 
@@ -129,16 +127,16 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                 AlertDialog.Builder(this)
                     .setTitle("Are you shore?")
                     .setMessage("This workout will be permanently deleted")
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                    .setPositiveButton(R.string.ok) { _, _ ->
                         lifecycleScope.launch {
                             workoutViewModel.deleteWorkout(workout)
                         }
-                        setResult(Activity.RESULT_OK, Intent().apply {
+                        setResult(RESULT_OK, Intent().apply {
                             putExtra(MainActivity.EXTRA_ID, workout.id)
                         })
                         finish()
                     }
-                    .setNegativeButton(android.R.string.cancel, null)
+                    .setNegativeButton(R.string.cancel, null)
                     .show()
             }
 
@@ -189,23 +187,40 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                     if (!isCountDownTimer1 && !isCountDownTimer2) {
 
                         startService(
-                            CountDownService.getIntent(
+                            CountDownServiceII.getIntent(
                                 this,
                                 timer.minutes,
                                 timer.seconds,
                                 TIMER_1
                             )
                         )
+
+//                        startService(
+//                            CountDownService.getIntent(
+//                                this,
+//                                timer.minutes,
+//                                timer.seconds,
+//                                TIMER_1
+//                            )
+//                        )
                     } else {
                         if (isCountDownTimer1) {
                             stopService(
-                                CountDownService.getIntent(
+                                CountDownServiceII.getIntent(
                                     this,
                                     timer.minutes,
                                     timer.seconds,
                                     TIMER_1
                                 )
                             )
+//                            stopService(
+//                                CountDownService.getIntent(
+//                                    this,
+//                                    timer.minutes,
+//                                    timer.seconds,
+//                                    TIMER_1
+//                                )
+//                            )
                             binding.timer1.text = timer.toText()
                             isCountDownTimer1 = false
                         }
@@ -216,7 +231,8 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
             binding.timer1.setOnLongClickListener {
                 val timer = workout.timers[TIMER_1]
                 if (isCountDownTimer1) {
-                    stopService(CountDownService.getIntent(this, -1, -1, TIMER_1))
+                    stopService(CountDownServiceII.getIntent(this, -1, -1, TIMER_1))
+//                    stopService(CountDownService.getIntent(this, -1, -1, TIMER_1))
                     binding.timer1.text = timer.toText()
                     isCountDownTimer1 = false
                 }
@@ -231,23 +247,39 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                 } else {
                     if (!isCountDownTimer2 && !isCountDownTimer1) {
                         startService(
-                            CountDownService.getIntent(
+                            CountDownServiceII.getIntent(
                                 this,
                                 timer.minutes,
                                 timer.seconds,
                                 TIMER_2
                             )
                         )
+//                        startService(
+//                            CountDownService.getIntent(
+//                                this,
+//                                timer.minutes,
+//                                timer.seconds,
+//                                TIMER_2
+//                            )
+//                        )
                     } else {
                         if (isCountDownTimer2) {
                             stopService(
-                                CountDownService.getIntent(
+                                CountDownServiceII.getIntent(
                                     this,
                                     timer.minutes,
                                     timer.seconds,
                                     TIMER_2
                                 )
                             )
+//                            stopService(
+//                                CountDownService.getIntent(
+//                                    this,
+//                                    timer.minutes,
+//                                    timer.seconds,
+//                                    TIMER_2
+//                                )
+//                            )
                             binding.timer2.text = timer.toText()
                             isCountDownTimer2 = false
                         }
@@ -258,7 +290,8 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
             binding.timer2.setOnLongClickListener {
                 val timer = workout.timers[TIMER_2]
                 if (isCountDownTimer2) {
-                    stopService(CountDownService.getIntent(this, -1, -1, TIMER_2))
+                    stopService(CountDownServiceII.getIntent(this, -1, -1, TIMER_2))
+//                    stopService(CountDownService.getIntent(this, -1, -1, TIMER_2))
                     binding.timer2.text = timer.toText()
                     isCountDownTimer2 = false
                 }
@@ -292,7 +325,6 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
             workoutViewModel.getUniqueExercises()
         }
     }
-
 
     private fun showTimePickerDialog(workout: Workout, timer: Int) {
         val minutes = workout.timers[timer].minutes
@@ -336,12 +368,10 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
         }
     }
 
-
     private fun toTimeForm(minutes: Int, seconds: Int): String {
         return if (seconds < 10) "$minutes:0$seconds"
         else "$minutes:$seconds"
     }
-
 
     companion object {
         const val TIMER_1 = 0
