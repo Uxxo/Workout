@@ -60,6 +60,9 @@
         <activity android:name=".ui.activity.BioParameterInfoActivity"
             android:screenOrientation="portrait"
             />
+        <activity
+            android:name=".ui.activity.SettingsActivity"
+            android:exported="false" />
 
 
     </application>

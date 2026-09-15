@@ -1,9 +1,14 @@
 package com.example.personalworkoutnotebook.ui.activity
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -67,7 +72,10 @@ class MainActivity : AppCompatActivity() {
                 .addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY))
         }
 
-
+//        Enter to the hidden menu (database control)
+        binding.menuButtonsLayout.myWorkouts.setOnClickListener {
+           startActivity(Intent(this, SettingsActivity::class.java))
+        }
 
     }
 

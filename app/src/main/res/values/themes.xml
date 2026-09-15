@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.PersonalWorkoutNotebook" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <!-- Base application theme. Меняем DayNight на Light, так как в App зафиксирована светлая тема -->
+    <style name="Theme.PersonalWorkoutNotebook" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">#787878</item>
         <item name="colorPrimaryVariant">#272727</item>
@@ -9,14 +9,22 @@
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+
+        <!-- НАСТРОЙКА СТАТУС-БАРА: Делаем его светлым (белым), чтобы он не сливался,
+             а иконки и часы принудительно делаем темными -->
+        <item name="android:statusBarColor" tools:targetApi="l">@color/white</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+
+        <!-- Гарантируем, что полноэкранный режим выключен -->
+        <item name="android:windowFullscreen">false</item>
+
         <!-- Customize your theme here. -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 
     <style name="Input" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox" />
 
+    <!-- Этот стиль избыточен, так как NoActionBar уже унаследован выше, но оставляем для обратной совместимости -->
     <style name="Theme.PersonalWorkoutNotebook.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
