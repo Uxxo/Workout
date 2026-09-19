@@ -29,7 +29,7 @@ class ExerciseAdapter(
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var exerciseList = mutableListOf<Exercise>()
+    var exerciseList = mutableListOf<Exercise>()
     private var uniqueExercisesList = mutableListOf<Exercise>()
     private var workoutStatus = Workout.DEFAULT
 
@@ -48,9 +48,31 @@ class ExerciseAdapter(
         notifyDataSetChanged()
     }
 
+    fun getWorkoutStatus() : Int{
+        return workoutStatus
+    }
+
     fun setWorkoutStatus(incomingStatus: Int) {
         workoutStatus = incomingStatus
         notifyDataSetChanged()
+    }
+
+    fun updateInternalListOnly(incomingExercises: List<Exercise>) {
+        this.exerciseList = incomingExercises.toMutableList()
+    }
+
+    fun getExerciseByPosition(position: Int): Exercise {
+        return exerciseList[position]
+    }
+
+    fun getExercisePositionBySet(set: Set): Int {
+        return exerciseList.indexOfFirst { exercise ->
+            exercise.sets.any { it.id == set.id }
+        }
+    }
+
+    fun updateExerciseAtPosition(position: Int, updatedExercise: Exercise) {
+        this.exerciseList[position] = updatedExercise
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
@@ -97,13 +119,22 @@ class ExerciseAdapter(
         }
     }
 
+    fun getHolderForExercise(recyclerView: RecyclerView, exercise: Exercise): ExerciseHolder? {
+        val index = exerciseList.indexOfFirst { it.id == exercise.id }
+        if (index != -1) {
+            return recyclerView.findViewHolderForAdapterPosition(index) as? ExerciseHolder
+        }
+        return null
+    }
 
-    inner class ExerciseHolder(private val exerciseBinding: ItemExerciseBinding) :
+    inner class ExerciseHolder(val exerciseBinding: ItemExerciseBinding) :
         RecyclerView.ViewHolder(exerciseBinding.root) {
 
-        fun bind(exercise: Exercise) {
-            val context = exerciseBinding.root.context
             val setAdapter = SetAdapter(callback)
+
+        fun bind(exercise: Exercise) {
+
+            val context = exerciseBinding.root.context
 
             exerciseBinding.root.tag = exerciseList.indexOf(exercise)
             exerciseBinding.deleteExercise.setOnClickListener {
@@ -123,7 +154,6 @@ class ExerciseAdapter(
                         .show()
                 }
             }
-
 
             val autoCompleteTextView = exerciseBinding.exerciseNameEditText
             val namesList = getExercisesTitleAndGroup(context ,uniqueExercisesList)
@@ -209,6 +239,10 @@ class ExerciseAdapter(
             }
 
             if (workoutStatus == Workout.IN_PROCESS) {
+                exerciseBinding.setRecycler.visibility = View.VISIBLE
+                exerciseBinding.addSet.visibility = View.VISIBLE
+                exerciseBinding.deleteSet.visibility = View.VISIBLE
+
                 exerciseBinding.setRecycler.adapter = setAdapter
                 setAdapter.setSetList(exercise.sets)
                 exerciseBinding.setRecycler.smoothScrollToPosition(exercise.sets.size - 1)
@@ -223,11 +257,13 @@ class ExerciseAdapter(
                         callback.invoke(ViewEvent.DeleteSet(set))
                     }
                 }
-
             } else {
                 exerciseBinding.setRecycler.visibility = View.GONE
                 exerciseBinding.addSet.visibility = View.GONE
                 exerciseBinding.deleteSet.visibility = View.GONE
+
+                exerciseBinding.addSet.setOnClickListener(null)
+                exerciseBinding.deleteSet.setOnClickListener(null)
             }
 
             if (exercise.notes == null || exercise.notes.isEmpty()) {

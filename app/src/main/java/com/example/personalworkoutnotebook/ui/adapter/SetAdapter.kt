@@ -19,7 +19,7 @@ class SetAdapter(
     private var setList = mutableListOf<Set>()
 
     fun setSetList(newSetList: List<Set>) {
-        setList = newSetList as MutableList<Set>
+        this.setList = newSetList.toMutableList()
         notifyDataSetChanged()
     }
 
@@ -45,7 +45,6 @@ class SetAdapter(
 
         fun bind(set: Set) {
             itemBinding.root.tag = setList.indexOf(set)
-
 
             if (set.mass != 0.0 && itemBinding.setMassLayout.editText?.text.toString() != set.mass.toShowIt()) {
                 itemBinding.setMassLayout.editText?.setText(set.mass.toShowIt())

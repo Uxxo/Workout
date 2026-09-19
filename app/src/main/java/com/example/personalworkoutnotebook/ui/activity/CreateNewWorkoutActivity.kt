@@ -74,15 +74,67 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
         binding = ActivityCreateWorkoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        lateinit var exerciseAdapter: ExerciseAdapter
 
-        val exerciseAdapter = ExerciseAdapter(HolderTypeConstants.WORKOUT_EXERCISE_HOLDER){ event ->
+        exerciseAdapter = ExerciseAdapter(HolderTypeConstants.WORKOUT_EXERCISE_HOLDER){ event ->
             when (event) {
                 is ViewEvent.SaveSet -> lifecycleScope.launch {
-                    workoutViewModel.saveSet(event.set) }
-                is ViewEvent.DeleteSet -> lifecycleScope.launch { workoutViewModel.deleteSet(event.set) }
+                    workoutViewModel.saveSet(event.set)
+                }
+
+                is ViewEvent.AddSetToExercise -> lifecycleScope.launch {
+
+                    workoutViewModel.addSetToExercise(event.exercise.id)
+
+
+                    val position = exerciseAdapter.exerciseList.indexOfFirst { it.id == event.exercise.id }
+
+                    if (position != -1) {
+
+                        val holder = binding.exerciseRecycler.findViewHolderForAdapterPosition(position) as? ExerciseAdapter.ExerciseHolder
+
+                        holder?.let { exerciseHolder ->
+
+                            val exercise = exerciseAdapter.getExerciseByPosition(position)
+
+
+                            exerciseHolder.setAdapter.setSetList(exercise.sets)
+
+
+                            exerciseHolder.setAdapter.notifyDataSetChanged()
+
+
+                            if (exercise.sets.isNotEmpty()) {
+                                exerciseHolder.exerciseBinding.setRecycler.smoothScrollToPosition(exercise.sets.size - 1)
+                            }
+                        }
+                    }
+                }
+
+                is ViewEvent.DeleteSet -> lifecycleScope.launch {
+                    workoutViewModel.deleteSet(event.set)
+
+
+                    val position = exerciseAdapter.exerciseList.indexOfFirst { it.id == event.set.exerciseId }
+
+                    if (position != -1) {
+
+                        val holder = binding.exerciseRecycler.findViewHolderForAdapterPosition(position) as? ExerciseAdapter.ExerciseHolder
+
+                        holder?.let { exerciseHolder ->
+
+                            val exercise = exerciseAdapter.getExerciseByPosition(position)
+
+
+                            exerciseHolder.setAdapter.setSetList(exercise.sets)
+
+                            exerciseHolder.setAdapter.notifyDataSetChanged()
+                        }
+                    }
+                }
+
                 is ViewEvent.SaveExercise -> lifecycleScope.launch { workoutViewModel.saveExercise(event.exercise) }
                 is ViewEvent.DeleteExercise -> lifecycleScope.launch { workoutViewModel.deleteExercise(event.exercise.id) }
-                is ViewEvent.AddSetToExercise -> lifecycleScope.launch { workoutViewModel.addSetToExercise(event.exercise.id) }
                 else ->{}
             }
         }
@@ -140,10 +192,28 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                     .show()
             }
 
-            binding.exerciseRecycler.adapter = exerciseAdapter
-            exerciseAdapter.setExercises(workout.exercises)
-            exerciseAdapter.setWorkoutStatus(workout.status)
+//            binding.exerciseRecycler.adapter = exerciseAdapter
+//            exerciseAdapter.setExercises(workout.exercises)
+//            exerciseAdapter.setWorkoutStatus(workout.status)
 
+            if (binding.exerciseRecycler.adapter == null) {
+                binding.exerciseRecycler.adapter = exerciseAdapter
+            }
+
+            val isFirstLoad = exerciseAdapter.itemCount == 0
+            val isStatusChanged = exerciseAdapter.getWorkoutStatus() != workout.status
+            val isExerciseCountChanged = exerciseAdapter.itemCount != workout.exercises.size
+
+            if (isFirstLoad || isStatusChanged || isExerciseCountChanged) {
+                exerciseAdapter.setWorkoutStatus(workout.status)
+                exerciseAdapter.setExercises(workout.exercises)
+
+                if (isExerciseCountChanged && workout.exercises.isNotEmpty()) {
+                    binding.exerciseRecycler.smoothScrollToPosition(workout.exercises.size - 1)
+                }
+            } else {
+                exerciseAdapter.updateInternalListOnly(workout.exercises)
+            }
 
             binding.startAndFinishButton.setOnClickListener {
                 lifecycleScope.launch { workoutViewModel.updateWorkoutValue(workout.id) }
@@ -167,9 +237,9 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                 }
             }
 
-            if (workout.exercises.isNotEmpty()) binding.exerciseRecycler.smoothScrollToPosition(
-                workout.exercises.size - 1
-            )
+//            if (workout.exercises.isNotEmpty()) binding.exerciseRecycler.smoothScrollToPosition(
+//                workout.exercises.size - 1
+//            )
 
             if (!workout.timers[TIMER_1].isTimeEmpty()) {
                 binding.timer1.text = workout.timers[TIMER_1].toText()
@@ -194,15 +264,6 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                                 TIMER_1
                             )
                         )
-
-//                        startService(
-//                            CountDownService.getIntent(
-//                                this,
-//                                timer.minutes,
-//                                timer.seconds,
-//                                TIMER_1
-//                            )
-//                        )
                     } else {
                         if (isCountDownTimer1) {
                             stopService(
@@ -213,14 +274,6 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                                     TIMER_1
                                 )
                             )
-//                            stopService(
-//                                CountDownService.getIntent(
-//                                    this,
-//                                    timer.minutes,
-//                                    timer.seconds,
-//                                    TIMER_1
-//                                )
-//                            )
                             binding.timer1.text = timer.toText()
                             isCountDownTimer1 = false
                         }
@@ -254,14 +307,6 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                                 TIMER_2
                             )
                         )
-//                        startService(
-//                            CountDownService.getIntent(
-//                                this,
-//                                timer.minutes,
-//                                timer.seconds,
-//                                TIMER_2
-//                            )
-//                        )
                     } else {
                         if (isCountDownTimer2) {
                             stopService(
@@ -272,14 +317,6 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                                     TIMER_2
                                 )
                             )
-//                            stopService(
-//                                CountDownService.getIntent(
-//                                    this,
-//                                    timer.minutes,
-//                                    timer.seconds,
-//                                    TIMER_2
-//                                )
-//                            )
                             binding.timer2.text = timer.toText()
                             isCountDownTimer2 = false
                         }
@@ -299,7 +336,6 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                 return@setOnLongClickListener true
             }
 
-
             binding.startNewExercise.setOnClickListener {
                 lifecycleScope.launch {
                     workoutViewModel.addNewExerciseToWorkout(workout.id)
@@ -314,8 +350,6 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
         workoutViewModel.isLoading.observe(this) { isLoading ->
             binding.workoutProgressLayout.isVisible(isLoading)
         }
-
-
     }
 
     override fun onStart() {
