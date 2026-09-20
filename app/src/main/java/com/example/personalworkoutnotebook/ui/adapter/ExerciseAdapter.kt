@@ -28,7 +28,9 @@ class ExerciseAdapter(
     private val callback: (event: ViewEvent) -> Unit
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
+    init {
+        setHasStableIds(true) // Информируем систему, что у каждого упражнения есть жесткий ID
+    }
     var exerciseList = mutableListOf<Exercise>()
     private var uniqueExercisesList = mutableListOf<Exercise>()
     private var workoutStatus = Workout.DEFAULT
@@ -73,6 +75,10 @@ class ExerciseAdapter(
 
     fun updateExerciseAtPosition(position: Int, updatedExercise: Exercise) {
         this.exerciseList[position] = updatedExercise
+    }
+
+    override fun getItemId(position: Int): Long {
+        return exerciseList[position].id
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =

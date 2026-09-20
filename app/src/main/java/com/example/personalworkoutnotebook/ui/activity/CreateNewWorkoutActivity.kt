@@ -153,41 +153,45 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                 binding.exerciseRecycler.adapter = exerciseAdapter
             }
 
-            val isFirstLoad = exerciseAdapter.itemCount == 0
-            val isStatusChanged = exerciseAdapter.getWorkoutStatus() != workout.status
-            val isExerciseCountChanged = exerciseAdapter.itemCount != workout.exercises.size
+            exerciseAdapter.setWorkoutStatus(workout.status)
+            exerciseAdapter.setExercises(workout.exercises)
 
-            if (isFirstLoad || isStatusChanged || isExerciseCountChanged) {
-                exerciseAdapter.setWorkoutStatus(workout.status)
-                exerciseAdapter.setExercises(workout.exercises)
 
-                if (isExerciseCountChanged && workout.exercises.isNotEmpty()) {
-                    binding.exerciseRecycler.smoothScrollToPosition(workout.exercises.size - 1)
-                }
-            } else {
-                exerciseAdapter.updateInternalListOnly(workout.exercises)
-
-                val position = workout.exercises.indexOfFirst { exercise ->
-                    val holder = binding.exerciseRecycler.findViewHolderForAdapterPosition(
-                        workout.exercises.indexOf(exercise)
-                    ) as? ExerciseAdapter.ExerciseHolder
-                    holder?.setAdapter?.itemCount != exercise.sets.size
-                }
-
-                if (position != -1) {
-                    val holder = binding.exerciseRecycler.findViewHolderForAdapterPosition(position) as? ExerciseAdapter.ExerciseHolder
-                    holder?.let { exerciseHolder ->
-                        val updatedExercise = workout.exercises[position]
-
-                        exerciseHolder.setAdapter.setSetList(updatedExercise.sets)
-                        exerciseHolder.setAdapter.notifyDataSetChanged()
-
-                        if (updatedExercise.sets.isNotEmpty()) {
-                            exerciseHolder.exerciseBinding.setRecycler.smoothScrollToPosition(updatedExercise.sets.size - 1)
-                        }
-                    }
-                }
-            }
+//            val isFirstLoad = exerciseAdapter.itemCount == 0
+//            val isStatusChanged = exerciseAdapter.getWorkoutStatus() != workout.status
+//            val isExerciseCountChanged = exerciseAdapter.itemCount != workout.exercises.size
+//
+//            if (isFirstLoad || isStatusChanged || isExerciseCountChanged) {
+//                exerciseAdapter.setWorkoutStatus(workout.status)
+//                exerciseAdapter.setExercises(workout.exercises)
+//
+//                if (isExerciseCountChanged && workout.exercises.isNotEmpty()) {
+//                    binding.exerciseRecycler.smoothScrollToPosition(workout.exercises.size - 1)
+//                }
+//            } else {
+//                exerciseAdapter.updateInternalListOnly(workout.exercises)
+//
+//                val position = workout.exercises.indexOfFirst { exercise ->
+//                    val holder = binding.exerciseRecycler.findViewHolderForAdapterPosition(
+//                        workout.exercises.indexOf(exercise)
+//                    ) as? ExerciseAdapter.ExerciseHolder
+//                    holder?.setAdapter?.itemCount != exercise.sets.size
+//                }
+//
+//                if (position != -1) {
+//                    val holder = binding.exerciseRecycler.findViewHolderForAdapterPosition(position) as? ExerciseAdapter.ExerciseHolder
+//                    holder?.let { exerciseHolder ->
+//                        val updatedExercise = workout.exercises[position]
+//
+//                        exerciseHolder.setAdapter.setSetList(updatedExercise.sets)
+//                        exerciseHolder.setAdapter.notifyDataSetChanged()
+//
+//                        if (updatedExercise.sets.isNotEmpty()) {
+//                            exerciseHolder.exerciseBinding.setRecycler.smoothScrollToPosition(updatedExercise.sets.size - 1)
+//                        }
+//                    }
+//                }
+//            }
 
             binding.startAndFinishButton.setOnClickListener {
                 lifecycleScope.launch { workoutViewModel.updateWorkoutValue(workout.id) }
