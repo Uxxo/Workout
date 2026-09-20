@@ -248,13 +248,12 @@ class ExerciseAdapter(
                 exerciseBinding.setRecycler.smoothScrollToPosition(exercise.sets.size - 1)
 
                 exerciseBinding.addSet.setOnClickListener {
-                    callback.invoke(ViewEvent.AddSetToExercise(exercise))
+                    callback.invoke(ViewEvent.AddSetToExercise(exercise.id))
                 }
 
                 exerciseBinding.deleteSet.setOnClickListener {
                     if (exercise.sets.size > 1) {
-                        val set = exercise.sets[exercise.sets.size - 1]
-                        callback.invoke(ViewEvent.DeleteSet(set))
+                        callback.invoke(ViewEvent.DeleteSet(exercise.id))
                     }
                 }
             } else {

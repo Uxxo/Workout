@@ -6,9 +6,9 @@ import com.example.personalworkoutnotebook.model.*
 import com.example.personalworkoutnotebook.model.Set
 
 sealed class ViewEvent {
-    data class AddSetToExercise(val exercise: Exercise): ViewEvent()
+    data class AddSetToExercise(val exerciseId: Long): ViewEvent()
     data class SaveSet(val set: Set) : ViewEvent()
-    data class DeleteSet(val set: Set) : ViewEvent()
+    data class DeleteSet(val exerciseId: Long) : ViewEvent()
 
     data class SaveExercise(val exercise: Exercise) : ViewEvent()
     data class DeleteExercise(val exercise: Exercise) : ViewEvent()

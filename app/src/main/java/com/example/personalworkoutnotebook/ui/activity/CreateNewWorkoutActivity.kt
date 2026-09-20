@@ -83,54 +83,11 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                 }
 
                 is ViewEvent.AddSetToExercise -> lifecycleScope.launch {
-
-                    workoutViewModel.addSetToExercise(event.exercise.id)
-
-
-                    val position = exerciseAdapter.exerciseList.indexOfFirst { it.id == event.exercise.id }
-
-                    if (position != -1) {
-
-                        val holder = binding.exerciseRecycler.findViewHolderForAdapterPosition(position) as? ExerciseAdapter.ExerciseHolder
-
-                        holder?.let { exerciseHolder ->
-
-                            val exercise = exerciseAdapter.getExerciseByPosition(position)
-
-
-                            exerciseHolder.setAdapter.setSetList(exercise.sets)
-
-
-                            exerciseHolder.setAdapter.notifyDataSetChanged()
-
-
-                            if (exercise.sets.isNotEmpty()) {
-                                exerciseHolder.exerciseBinding.setRecycler.smoothScrollToPosition(exercise.sets.size - 1)
-                            }
-                        }
-                    }
+                    workoutViewModel.addSetToExercise(event.exerciseId)
                 }
 
                 is ViewEvent.DeleteSet -> lifecycleScope.launch {
-                    workoutViewModel.deleteSet(event.set)
-
-
-                    val position = exerciseAdapter.exerciseList.indexOfFirst { it.id == event.set.exerciseId }
-
-                    if (position != -1) {
-
-                        val holder = binding.exerciseRecycler.findViewHolderForAdapterPosition(position) as? ExerciseAdapter.ExerciseHolder
-
-                        holder?.let { exerciseHolder ->
-
-                            val exercise = exerciseAdapter.getExerciseByPosition(position)
-
-
-                            exerciseHolder.setAdapter.setSetList(exercise.sets)
-
-                            exerciseHolder.setAdapter.notifyDataSetChanged()
-                        }
-                    }
+                    workoutViewModel.deleteSet(event.exerciseId)
                 }
 
                 is ViewEvent.SaveExercise -> lifecycleScope.launch { workoutViewModel.saveExercise(event.exercise) }
@@ -192,10 +149,6 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                     .show()
             }
 
-//            binding.exerciseRecycler.adapter = exerciseAdapter
-//            exerciseAdapter.setExercises(workout.exercises)
-//            exerciseAdapter.setWorkoutStatus(workout.status)
-
             if (binding.exerciseRecycler.adapter == null) {
                 binding.exerciseRecycler.adapter = exerciseAdapter
             }
@@ -213,6 +166,27 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                 }
             } else {
                 exerciseAdapter.updateInternalListOnly(workout.exercises)
+
+                val position = workout.exercises.indexOfFirst { exercise ->
+                    val holder = binding.exerciseRecycler.findViewHolderForAdapterPosition(
+                        workout.exercises.indexOf(exercise)
+                    ) as? ExerciseAdapter.ExerciseHolder
+                    holder?.setAdapter?.itemCount != exercise.sets.size
+                }
+
+                if (position != -1) {
+                    val holder = binding.exerciseRecycler.findViewHolderForAdapterPosition(position) as? ExerciseAdapter.ExerciseHolder
+                    holder?.let { exerciseHolder ->
+                        val updatedExercise = workout.exercises[position]
+
+                        exerciseHolder.setAdapter.setSetList(updatedExercise.sets)
+                        exerciseHolder.setAdapter.notifyDataSetChanged()
+
+                        if (updatedExercise.sets.isNotEmpty()) {
+                            exerciseHolder.exerciseBinding.setRecycler.smoothScrollToPosition(updatedExercise.sets.size - 1)
+                        }
+                    }
+                }
             }
 
             binding.startAndFinishButton.setOnClickListener {

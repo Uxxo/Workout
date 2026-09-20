@@ -269,11 +269,15 @@ class WorkoutViewModel @Inject constructor(
         setRepository.save(set)
     }
 
-    suspend fun deleteSet(set: Set) {
-        setRepository.delete(set.id)
-        val editedExercise = exerciseRepository.getById(set.exerciseId)
-        val editedWorkout = editedExercise?.workoutId?.let { workoutRepository.getById(it) }
-        editedWorkout?.id?.let { updateWorkoutValue(it) }
+    suspend fun deleteSet(exerciseId: Long) {
+        val sets = setRepository.getAllByExerciseId(exerciseId)
+        if (sets.size>1) {
+            val lastSet = sets.last()
+            setRepository.delete(lastSet.id)
+            val editedExercise = exerciseRepository.getById(exerciseId)
+            val editedWorkout = editedExercise?.workoutId?.let { workoutRepository.getById(it) }
+            editedWorkout?.id?.let { updateWorkoutValue(it) }
+        }
     }
 
     suspend fun addSetToExercise(exerciseId: Long) {

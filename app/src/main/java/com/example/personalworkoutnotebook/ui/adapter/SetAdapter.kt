@@ -17,6 +17,7 @@ class SetAdapter(
     RecyclerView.Adapter<SetAdapter.SetHolder>() {
 
     private var setList = mutableListOf<Set>()
+    private var onBind = true
 
     fun setSetList(newSetList: List<Set>) {
         this.setList = newSetList.toMutableList()
@@ -33,8 +34,11 @@ class SetAdapter(
         )
 
 
-    override fun onBindViewHolder(holder: SetHolder, position: Int) =
+    override fun onBindViewHolder(holder: SetHolder, position: Int) {
+        onBind = true
         holder.bind(setList[position])
+        onBind = false
+    }
 
     override fun getItemCount(): Int {
         return setList.size
@@ -44,7 +48,9 @@ class SetAdapter(
         RecyclerView.ViewHolder(itemBinding.root) {
 
         fun bind(set: Set) {
-            itemBinding.root.tag = setList.indexOf(set)
+            itemBinding.root.tag = adapterPosition
+            itemBinding.setMassLayout.editText?.setText("")
+            itemBinding.setRepeatsLayout.editText?.setText("")
 
             if (set.mass != 0.0 && itemBinding.setMassLayout.editText?.text.toString() != set.mass.toShowIt()) {
                 itemBinding.setMassLayout.editText?.setText(set.mass.toShowIt())
@@ -53,7 +59,7 @@ class SetAdapter(
 
             itemBinding.setMassLayout.editText?.afterTextChanged { it ->
                 val text = it.replace(',', '.', false)
-                println()
+                if (!onBind){
                 val index = itemBinding.root.tag as Int
                     val editedSet =
                         if (text.isValidDouble() && text != "-") setList[index].copy(mass = text.toDouble())
@@ -62,6 +68,7 @@ class SetAdapter(
                     callback.invoke(ViewEvent.SaveSet(editedSet))
                     setList.removeAt(index)
                     setList.add(index, editedSet)
+                }
             }
 
             if(set.repeat !=0 && itemBinding.setRepeatsLayout.editText?.toString() != set.repeat.toString()){
@@ -79,7 +86,10 @@ class SetAdapter(
             }
 
             itemBinding.setRepeatsLayout.editText?.afterTextChanged { text ->
+
+                if (!onBind) {
                     val index = itemBinding.root.tag as Int
+
                     val editedSet =
                         if (text.isBlank()) set.copy(repeat = 0)
                         else setList[index].copy(repeat = text.toValidInt())
@@ -87,6 +97,7 @@ class SetAdapter(
                     callback.invoke(ViewEvent.SaveSet(editedSet))
                     setList.removeAt(index)
                     setList.add(index, editedSet)
+                }
             }
 
             itemBinding.setRepeatsEditText.setOnLongClickListener { it ->
