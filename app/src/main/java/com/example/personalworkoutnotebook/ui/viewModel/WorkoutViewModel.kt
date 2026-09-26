@@ -281,11 +281,13 @@ class WorkoutViewModel @Inject constructor(
     }
 
     suspend fun addSetToExercise(exerciseId: Long) {
-        _isLoading.postValue(true)
+//        _isLoading.postValue(true)
         setRepository.save(createNewSet(exerciseId))
         val updatedExercise = exerciseRepository.getById(exerciseId) ?: return
-        updateWorkoutValue(updatedExercise.workoutId)
-        _isLoading.postValue(false)
+//        updateWorkoutValue(updatedExercise.workoutId)
+        val editedWorkout = updatedExercise?.workoutId?.let { workoutRepository.getById(it) }
+        editedWorkout?.id?.let { updateWorkoutValue(it) }
+//        _isLoading.postValue(false)
     }
 
     @RequiresApi(Build.VERSION_CODES.HONEYCOMB)
