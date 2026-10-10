@@ -4,7 +4,7 @@ import androidx.room.*
 import com.example.personalworkoutnotebook.model.*
 
 @Database(
-    version = 1,
+    version = 2,
     entities = [
         RoomWorkout::class,
         RoomExercise::class,

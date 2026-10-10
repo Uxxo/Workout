@@ -13,7 +13,8 @@ data class Exercise(
     val name: String?,
     val notes: String?,
     val group: String?,
-    val sets: List<Set> = listOf()
+    val sets: List<Set> = listOf(),
+    val isIncludedInStatistics: Boolean = true
 )
 
 @Entity(tableName = "exercises", foreignKeys = [
@@ -26,7 +27,8 @@ data class RoomExercise(
     @ColumnInfo(name = "name") val name: String?,
     @ColumnInfo(name = "notes") val notes: String?,
     @ColumnInfo(name = "group") val group: String?,
-    @ColumnInfo(name = "workout_id", index = true) val workoutId: Long
+    @ColumnInfo(name = "workout_id", index = true) val workoutId: Long,
+    @ColumnInfo(name = "is_included_in_statistics", defaultValue = "1") val isIncludedInStatistics: Boolean = true
 )
 
 data class RoomExerciseWithSet(
@@ -41,7 +43,8 @@ fun Exercise.toRoom() = RoomExercise(
     name = this.name?.toFirstUpperCase()?.trim(),
     notes = this.notes,
     group = this.group?.toFirstUpperCase()?.trim(),
-    workoutId = this.workoutId
+    workoutId = this.workoutId,
+    isIncludedInStatistics = this.isIncludedInStatistics
 )
 
 fun RoomExerciseWithSet.toModel(): Exercise = Exercise(
@@ -50,7 +53,9 @@ fun RoomExerciseWithSet.toModel(): Exercise = Exercise(
     name = this.exercise.name,
     notes = this.exercise.notes,
     group = this.exercise.group,
-    sets = this.sets.map { it.toModel() }
+    sets = this.sets.map { it.toModel() },
+    isIncludedInStatistics = this.exercise.isIncludedInStatistics
+
 )
 
 

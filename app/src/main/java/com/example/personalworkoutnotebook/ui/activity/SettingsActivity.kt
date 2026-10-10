@@ -8,8 +8,10 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.personalworkoutnotebook.R
 import com.example.personalworkoutnotebook.dao.DbModule // Импортируем наш модуль БД
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -65,16 +67,22 @@ class SettingsActivity : AppCompatActivity() {
         val btnImport = findViewById<Button>(R.id.btn_import_db)
 
         btnExport.setOnClickListener {
-            try {
-                // Подготавливаем файл (сливаем все последние данные)
-                DbModule.prepareDbForExport()
-                // Запускаем системное окно сохранения
-                exportLauncher.launch("workout_backup_${System.currentTimeMillis()}.db")
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(this, "Ошибка подготовки данных: ${e.message}", Toast.LENGTH_SHORT).show()
+            lifecycleScope.launch {
+                try {
+                    DbModule.prepareDbForExport()
+                    exportLauncher.launch("workout_backup_${System.currentTimeMillis()}.db")
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(
+                        this@SettingsActivity,
+                        "Ошибка подготовки данных: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
+
 
         btnImport.setOnClickListener {
             importLauncher.launch(arrayOf("*/*"))
@@ -82,7 +90,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 }
 
-// Утилитарный объект для работы с файлами Room
+
 object BackupManagerII {
     private const val DATABASE_NAME = "workouts-db"
 
