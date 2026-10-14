@@ -8,8 +8,10 @@ import com.example.personalworkoutnotebook.databinding.ItemExerciseInfoBinding
 import com.example.personalworkoutnotebook.extension.toText
 import com.example.personalworkoutnotebook.model.ExerciseWithDate
 import com.example.personalworkoutnotebook.model.setsToString
+import com.example.personalworkoutnotebook.ui.ViewEvent
 
 class ExerciseInfoAdapter(
+    private val callback: (event: ViewEvent) -> Unit
 ): RecyclerView.Adapter<ExerciseInfoAdapter.ExerciseInfoHolder>() {
 
     private var exerciseList = mutableListOf<ExerciseWithDate>()
@@ -50,6 +52,13 @@ class ExerciseInfoAdapter(
                      binding.notes.text = exercise.notes
                      binding.notes.visibility = View.VISIBLE
                  }
+
+                binding.btnToggleStatistics.isActivated = exercise.isIncludedInStatistics
+                binding.btnToggleStatistics.setOnClickListener {
+                    val newStatus = !exercise.isIncludedInStatistics
+                    binding.btnToggleStatistics.isActivated = newStatus
+                    callback.invoke(ViewEvent.ChangeExerciseStatisticStatus(exercise.id))
+                }
             }
         }
 }

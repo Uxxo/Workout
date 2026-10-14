@@ -212,15 +212,7 @@ class WorkoutViewModel @Inject constructor(
         allWorkouts.forEach { workout ->
             workout.exercises.forEach { exercise ->
                 if (exercise.name.equals(exerciseName) && exercise.group.equals(exerciseGroup)) {
-                    val resultExercise = ExerciseWithDate(
-                        exercise.id,
-                        exercise.workoutId,
-                        workout.date,
-                        exercise.name,
-                        exercise.notes,
-                        exercise.group,
-                        exercise.sets
-                    )
+                    val resultExercise = exercise.toExerciseWithDate(workout)
                     resultList.add(resultExercise)
                 }
             }
@@ -249,6 +241,12 @@ class WorkoutViewModel @Inject constructor(
             }
         }
         loadExerciseById(exerciseId)
+    }
+
+    suspend fun changeExerciseStatisticStatus(exerciseId: Long) {
+        val exercise = exerciseRepository.getById(exerciseId) ?: return
+        val updatedExercise = exercise.copy(isIncludedInStatistics = !exercise.isIncludedInStatistics)
+        exerciseRepository.save(updatedExercise)
     }
 
 //    suspend fun loadExercisesDataForGraphic(id: Long) {

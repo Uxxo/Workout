@@ -124,7 +124,19 @@ data class ExerciseWithDate(
     val name: String?,
     val notes: String?,
     val group: String?,
-    val sets: List<Set> = listOf()
+    val sets: List<Set> = listOf(),
+    val isIncludedInStatistics: Boolean = true
+)
+
+fun Exercise.toExerciseWithDate(workout: Workout): ExerciseWithDate = ExerciseWithDate(
+    id = this.id,
+    workoutId = this.workoutId,
+    date = workout.date,
+    name = this.name,
+    notes = this.notes,
+    group = this.group,
+    sets = this.sets,
+    isIncludedInStatistics = this.isIncludedInStatistics
 )
 
 fun ExerciseWithDate.setsToString(): String {

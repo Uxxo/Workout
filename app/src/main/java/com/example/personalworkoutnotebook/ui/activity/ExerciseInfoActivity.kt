@@ -33,7 +33,14 @@ class ExerciseInfoActivity : AppCompatActivity(){
         binding = ActivityExerciseInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val adapter = ExerciseInfoAdapter()
+        val adapter = ExerciseInfoAdapter(){event ->
+            when(event) {
+                is ViewEvent.ChangeExerciseStatisticStatus -> lifecycleScope.launch {
+                    workoutViewModel.changeExerciseStatisticStatus(event.exerciseId)
+                } else -> {}
+            }
+        }
+
         binding.fieldsRecycler.adapter = adapter
 
         workoutViewModel.exercise.observe(this){ exercise ->

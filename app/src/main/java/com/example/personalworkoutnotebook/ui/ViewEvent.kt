@@ -25,4 +25,5 @@ sealed class ViewEvent {
     data class SaveBioParameterValue(val value: BioParameterValue) : ViewEvent()
     data class DeleteBioParameterValue(val value: BioParameterValue) : ViewEvent()
 
+    data class ChangeExerciseStatisticStatus(val exerciseId: Long) : ViewEvent()
 }
