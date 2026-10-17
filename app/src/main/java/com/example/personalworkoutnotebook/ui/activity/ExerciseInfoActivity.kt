@@ -46,12 +46,17 @@ class ExerciseInfoActivity : AppCompatActivity(){
         workoutViewModel.exercise.observe(this){ exercise ->
             lifecycleScope.launch {
                 workoutViewModel.getExerciseWithDateByNameAndGroup(exercise.name, exercise.group)
+                workoutViewModel.updateActualWeightInViewModel(exercise.id)
             }
 
             binding.exerciseTitle.text = exercise.name
             binding.renameExercise.setOnClickListener {
                 createExerciseRenamingDialog(this,exercise)
             }
+        }
+
+        workoutViewModel.actualWeight.observe(this) { weight ->
+            binding.actualWeight.text = "Actual weight: $weight"
         }
 
         workoutViewModel.exerciseWithDate.observe(this){exercisesList ->

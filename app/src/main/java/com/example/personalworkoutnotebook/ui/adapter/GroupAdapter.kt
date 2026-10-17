@@ -48,7 +48,7 @@ class GroupAdapter(
         fun bind(group: Group) {
 
             val exerciseAdapter = ExerciseAdapter(HolderTypeConstants.GROUP_EXERCISE_HOLDER,callback)
-            exerciseAdapter.setExercises(group.exerciseList)
+            exerciseAdapter.setExercises(group.exerciseList.sortedBy { it.name })
             groupBinding.exerciseRecycler.adapter = exerciseAdapter
             groupBinding.exerciseRecycler.visibility = View.GONE
 

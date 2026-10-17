@@ -2,6 +2,7 @@ package com.example.personalworkoutnotebook.repository
 
 import com.example.personalworkoutnotebook.dao.ExerciseDao
 import com.example.personalworkoutnotebook.model.Exercise
+import com.example.personalworkoutnotebook.model.RoomExerciseWithSet
 import com.example.personalworkoutnotebook.model.toModel
 import com.example.personalworkoutnotebook.model.toRoom
 import kotlinx.coroutines.Dispatchers
@@ -24,17 +25,27 @@ class ExerciseRepository @Inject constructor(
         }
     }
 
-    suspend fun getExerciseByName(name: String, group: String): List<Exercise>{
-        return withContext(Dispatchers.IO){
+    suspend fun getAllByNameAndGroup(exerciseName: String?, exerciseGroup: String?): List<Exercise?>{
+        return withContext(Dispatchers.IO) {
             val exerciseList: MutableList<Exercise> = mutableListOf()
-            exerciseDao.getExercisesWithSetsByExerciseName(name)?.forEach { roomExerciseWithSet ->
-                if(roomExerciseWithSet.exercise.group == group) {
-                    exerciseList.add(roomExerciseWithSet.toModel())
-                }
+            exerciseDao.getAllByNameAndGroup(exerciseName, exerciseGroup).forEach { it ->
+                exerciseList.add(it.toModel())
             }
             exerciseList
         }
     }
+
+//    suspend fun getExerciseByNameAndGroup(name: String, group: String): List<Exercise>{
+//        return withContext(Dispatchers.IO){
+//            val exerciseList: MutableList<Exercise> = mutableListOf()
+//            exerciseDao.getExercisesWithSetsByExerciseName(name)?.forEach { roomExerciseWithSet ->
+//                if(roomExerciseWithSet.exercise.group == group) {
+//                    exerciseList.add(roomExerciseWithSet.toModel())
+//                }
+//            }
+//            exerciseList
+//        }
+//    }
 
     suspend fun getById(id: Long): Exercise? {
         return withContext(Dispatchers.IO) {

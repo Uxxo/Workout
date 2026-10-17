@@ -20,9 +20,13 @@ interface ExerciseDao {
     @Query("SELECT * FROM exercises")
     suspend fun getExercisesWithSets(): List<RoomExerciseWithSet>?
 
+//    @Transaction
+//    @Query("SELECT * FROM exercises WHERE name LIKE :name")
+//    suspend fun getExercisesWithSetsByExerciseName(name: String): List<RoomExerciseWithSet>?
+
     @Transaction
-    @Query("SELECT * FROM exercises WHERE name LIKE :name")
-    suspend fun getExercisesWithSetsByExerciseName(name: String): List<RoomExerciseWithSet>?
+    @Query("SELECT * FROM exercises WHERE name = :exerciseName AND `group` = :exerciseGroup")
+    suspend fun getAllByNameAndGroup(exerciseName: String?, exerciseGroup: String?): List<RoomExerciseWithSet>
 
     @Transaction
     @Query("SELECT * FROM exercises WHERE id = :id")

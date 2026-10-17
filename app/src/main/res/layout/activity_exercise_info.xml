@@ -15,8 +15,26 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/actualWeight"
+        tools:text="Exercise title:" />
+
+    <TextView
+        android:id="@+id/includeInStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/exerciseTitle"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/fields_recycler"
-        tools:text="Exercise title" />
+        tools:text="Track in Stats" />
+
+    <TextView
+        android:id="@+id/actualWeight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/exerciseTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/fields_recycler"
+        tools:text="Actual weight:" />
 
     <ImageButton
         android:id="@+id/rename_exercise"
@@ -36,7 +54,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/exerciseTitle"
+        app:layout_constraintTop_toBottomOf="@id/actualWeight"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:orientation="vertical"
         tools:listitem="@layout/item_exercise_info"

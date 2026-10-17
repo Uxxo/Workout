@@ -26,7 +26,7 @@ class WorkoutViewModel @Inject constructor(
     private val workoutRepository: WorkoutRepository,
     private val exerciseRepository: ExerciseRepository,
     private val setRepository: SetRepository,
-    private val timerRepository: WorkoutTimerRepository,
+    private val timerRepository: WorkoutTimerRepository
 
 
 //    private val dbFactory: DBFactory
@@ -69,6 +69,10 @@ class WorkoutViewModel @Inject constructor(
     val uniqueExercises: LiveData<List<Exercise>>
         get() = _uniqueExercises
 
+
+    private var _actualWeight = MutableLiveData<Double>()
+    val actualWeight:LiveData<Double>
+        get() = _actualWeight
 
     suspend fun updateWorkoutValue(workoutId: Long) {
         _workout.value = workoutRepository.getById(workoutId)
@@ -247,6 +251,19 @@ class WorkoutViewModel @Inject constructor(
         val exercise = exerciseRepository.getById(exerciseId) ?: return
         val updatedExercise = exercise.copy(isIncludedInStatistics = !exercise.isIncludedInStatistics)
         exerciseRepository.save(updatedExercise)
+        updateActualWeightInViewModel(exerciseId)
+    }
+
+    suspend fun updateActualWeightInViewModel(exerciseId: Long){
+        val exercise = exerciseRepository.getById(exerciseId) ?: return
+        var result = -1000.0
+        val incomingMaxValue = WorkoutDataService().getActualMaxMassForExercise(exerciseRepository.getAllByNameAndGroup(
+            exercise.name, exercise.group))
+        if (incomingMaxValue > result) {
+            result = incomingMaxValue
+        }
+        if (result > -1000.0) _actualWeight.value = result
+        else _actualWeight.value = 0.0
     }
 
 //    suspend fun loadExercisesDataForGraphic(id: Long) {

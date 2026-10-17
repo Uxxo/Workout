@@ -210,7 +210,7 @@ class ExerciseAdapter(
             exerciseBinding.exerciseName.editText?.afterTextChanged { text ->
                 if (exerciseBinding.exerciseName.editText?.text.toString() != exercise.name) {
                     if (!onBind) {
-                        if (text.length > 10) exerciseBinding.exerciseGroup.visibility =
+                        if (text.length > 6) exerciseBinding.exerciseGroup.visibility =
                             View.VISIBLE
                         val index = exerciseBinding.root.tag as Int
                         val editedExercise =

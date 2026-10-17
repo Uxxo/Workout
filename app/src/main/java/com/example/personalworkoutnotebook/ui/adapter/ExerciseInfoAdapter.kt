@@ -55,8 +55,9 @@ class ExerciseInfoAdapter(
 
                 binding.btnToggleStatistics.isActivated = exercise.isIncludedInStatistics
                 binding.btnToggleStatistics.setOnClickListener {
-                    val newStatus = !exercise.isIncludedInStatistics
-                    binding.btnToggleStatistics.isActivated = newStatus
+                    val currentVisualState = binding.btnToggleStatistics.isActivated
+                    val newVisualState = !currentVisualState
+                    binding.btnToggleStatistics.isActivated = newVisualState
                     callback.invoke(ViewEvent.ChangeExerciseStatisticStatus(exercise.id))
                 }
             }

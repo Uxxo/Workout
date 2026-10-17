@@ -42,6 +42,7 @@
         android:src="@drawable/selector_statistics_status"
         android:contentDescription="Participation_in_statistics"
         android:padding="12dp"
+        app:tint="#424242"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

@@ -14,34 +14,38 @@ class WorkoutDataService {
         val groupMap: MutableMap<String, MutableMap<String, Exercise>> = mutableMapOf()
 
         exerciseList.forEach { exercise ->
-            if (exercise?.name != null) {
-                val incomingExercise =
-                    if (exercise.group == null) exercise.copy(group = groupOtherName)
-                    else exercise
-                if (groupMap.containsKey(incomingExercise.group?.trim())) {
-                    val exerciseMap = groupMap[incomingExercise.group?.trim()]
-                    if (exerciseMap != null) {
-                        if (exerciseMap.containsKey(incomingExercise.name!!.trim())) {
-                            val checkingExercise = exerciseMap[incomingExercise.name.trim()]
-                            if (checkingExercise != null) {
-                                if (incomingExercise.getMaxMass() > checkingExercise.getMaxMass()) {
-                                    exerciseMap += incomingExercise.name.trim() to incomingExercise
-                                    groupMap += incomingExercise.group!!.trim() to exerciseMap
+            if (exercise != null){
+                if (exercise.name != null) {
+                    val incomingExercise =
+                        if (exercise.group == null) exercise.copy(group = groupOtherName)
+                        else exercise
+                    if (groupMap.containsKey(incomingExercise.group?.trim())) {
+                        val exerciseMap = groupMap[incomingExercise.group?.trim()]
+                        if (exerciseMap != null) {
+                            if (exerciseMap.containsKey(incomingExercise.name!!.trim())) {
+                                val checkingExercise = exerciseMap[incomingExercise.name.trim()]
+                                if (checkingExercise != null) {
+                                    if (incomingExercise.getMaxMass() > checkingExercise.getMaxMass()) {
+                                        exerciseMap += incomingExercise.name.trim() to incomingExercise
+                                        groupMap += incomingExercise.group!!.trim() to exerciseMap
+                                    }
+                                    if (incomingExercise.getMaxMass() == checkingExercise.getMaxMass() &&
+                                        incomingExercise.getMaxRepeat(incomingExercise.getMaxMass()) > checkingExercise.getMaxRepeat(
+                                            incomingExercise.getMaxMass()
+                                        )
+                                    ) {
+                                        exerciseMap += incomingExercise.name.trim() to incomingExercise
+                                        groupMap += incomingExercise.group!!.trim() to exerciseMap
+                                    }
                                 }
-                                if (incomingExercise.getMaxMass() == checkingExercise.getMaxMass() &&
-                                    incomingExercise.getMaxRepeat(incomingExercise.getMaxMass()) > checkingExercise.getMaxRepeat(incomingExercise.getMaxMass())
-                                ) {
-                                    exerciseMap += incomingExercise.name.trim() to incomingExercise
-                                    groupMap += incomingExercise.group!!.trim() to exerciseMap
-                                }
-                            }
-                        } else exerciseMap[incomingExercise.name.trim()] = incomingExercise
+                            } else exerciseMap[incomingExercise.name.trim()] = incomingExercise
 
+                        }
+                    } else {
+                        val exerciseMap: MutableMap<String, Exercise> =
+                            mutableMapOf(incomingExercise.name!!.trim() to incomingExercise)
+                        groupMap[incomingExercise.group!!.trim()] = exerciseMap
                     }
-                } else {
-                    val exerciseMap: MutableMap<String, Exercise> =
-                        mutableMapOf(incomingExercise.name!!.trim() to incomingExercise)
-                    groupMap[incomingExercise.group!!.trim()] = exerciseMap
                 }
             }
         }
@@ -130,6 +134,14 @@ class WorkoutDataService {
             }
         }
         return uniqueExercises
+    }
+
+    fun getActualMaxMassForExercise(exercises: List<Exercise?>):Double {
+        var result = -1000.0
+        exercises.forEach {
+            if(it != null && it.isIncludedInStatistics && getMaxSetMass(it.sets) > result) result = getMaxSetMass(it.sets)
+        }
+        return result
     }
 
     fun getExercisesInfoForGraphic(exerciseList: List<Exercise>, workoutList: List<Workout>): Map<Calendar, Double> {
