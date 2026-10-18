@@ -7,7 +7,7 @@ import com.example.personalworkoutnotebook.model.*
 import com.example.personalworkoutnotebook.model.Set
 import java.util.*
 
-class WorkoutDataService {
+object WorkoutDataService {
 
     fun getGroupList(groupOtherName: String, exerciseList: List<Exercise?>): List<Group> {
 
@@ -158,7 +158,7 @@ class WorkoutDataService {
     }
 
     private fun getMaxSetMass(sets: List<Set>): Double {
-        var maxMass: Double = NOT_VALID_MASS
+        var maxMass: Double = -1000.0
         sets.forEach { set ->
             if (set.mass > maxMass && set.repeat > 0) maxMass = set.mass
         }
@@ -166,7 +166,7 @@ class WorkoutDataService {
 
     }
 
-    companion object {
-        private const val NOT_VALID_MASS = -1000.0
-    }
+//    object {
+//        private const val NOT_VALID_MASS = -1000.0
+//    }
 }

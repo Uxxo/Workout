@@ -90,6 +90,11 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                     workoutViewModel.deleteSet(event.exerciseId)
                 }
 
+                is ViewEvent.SaveExerciseWithActualWeight -> lifecycleScope.launch {
+                    workoutViewModel.saveExerciseWithActualWeight(event.exercise,
+                        event.newName, event.newGroup, event.workoutId)
+                }
+
                 is ViewEvent.SaveExercise -> lifecycleScope.launch { workoutViewModel.saveExercise(event.exercise) }
                 is ViewEvent.DeleteExercise -> lifecycleScope.launch { workoutViewModel.deleteExercise(event.exercise.id) }
                 else ->{}
@@ -155,6 +160,7 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
 
             exerciseAdapter.setWorkoutStatus(workout.status)
             exerciseAdapter.setExercises(workout.exercises)
+            exerciseAdapter.setWorkoutId(workout.id)
 
             binding.startAndFinishButton.setOnClickListener {
                 lifecycleScope.launch { workoutViewModel.updateWorkoutValue(workout.id) }
@@ -177,10 +183,6 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
                     }
                 }
             }
-
-//            if (workout.exercises.isNotEmpty()) binding.exerciseRecycler.smoothScrollToPosition(
-//                workout.exercises.size - 1
-//            )
 
             if (!workout.timers[TIMER_1].isTimeEmpty()) {
                 binding.timer1.text = workout.timers[TIMER_1].toText()

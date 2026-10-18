@@ -59,6 +59,8 @@ class ExerciseInfoActivity : AppCompatActivity(){
             binding.actualWeight.text = "Actual weight: $weight"
         }
 
+        binding.includeInStats.text = "Track in Stats"
+
         workoutViewModel.exerciseWithDate.observe(this){exercisesList ->
             adapter.setExercisesList(exercisesList)
         }

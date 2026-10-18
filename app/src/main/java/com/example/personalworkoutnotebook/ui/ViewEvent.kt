@@ -11,6 +11,8 @@ sealed class ViewEvent {
     data class DeleteSet(val exerciseId: Long) : ViewEvent()
 
     data class SaveExercise(val exercise: Exercise) : ViewEvent()
+    data class SaveExerciseWithActualWeight(val exercise: Exercise, val newName: String,
+                                            val newGroup:String,val workoutId: Long) : ViewEvent()
     data class DeleteExercise(val exercise: Exercise) : ViewEvent()
 
     data class DeleteWorkout(val workout: Workout) : ViewEvent()

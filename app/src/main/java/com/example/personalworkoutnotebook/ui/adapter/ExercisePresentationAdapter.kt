@@ -24,7 +24,6 @@ class ExercisePresentationAdapter(
             )
         )
 
-
     override fun onBindViewHolder(holder: ExercisePresentationHolder, position: Int) {
         onBind = true
         holder.bind(exerciseList[position])
@@ -35,7 +34,6 @@ class ExercisePresentationAdapter(
     override fun getItemCount(): Int {
         return exerciseList.size
     }
-
 
     inner class ExercisePresentationHolder(private val exerciseBinding: ItemExercisePresentationBinding) :
         RecyclerView.ViewHolder(exerciseBinding.root) {

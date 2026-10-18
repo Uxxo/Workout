@@ -34,6 +34,7 @@ class ExerciseAdapter(
     var exerciseList = mutableListOf<Exercise>()
     private var uniqueExercisesList = mutableListOf<Exercise>()
     private var workoutStatus = Workout.DEFAULT
+    private var workoutId = 0L
 
     private var exercisesMap = mutableMapOf<String, Exercise>()
     private var onBind = true
@@ -57,6 +58,10 @@ class ExerciseAdapter(
     fun setWorkoutStatus(incomingStatus: Int) {
         workoutStatus = incomingStatus
         notifyDataSetChanged()
+    }
+
+    fun setWorkoutId(id: Long){
+        workoutId = id
     }
 
     fun updateInternalListOnly(incomingExercises: List<Exercise>) {
@@ -174,24 +179,28 @@ class ExerciseAdapter(
                     if (foundExercise != null) {
                         val newName = foundExercise.name
                         val newGroup = foundExercise.group
-                        val maxMass = foundExercise.getMaxMass()
+//                        val maxMass = foundExercise.getMaxMass()
 
                         if (!onBind) {
 
-                            val editedExercise =
-                                updateExercise(exercise, newName, newGroup, maxMass)
-                            callback.invoke(ViewEvent.SaveSet(editedExercise.sets[0]))
-                            callback.invoke(ViewEvent.SaveExercise(editedExercise))
+                            autoCompleteTextView.dismissDropDown()
+                            autoCompleteTextView.clearFocus()
+                            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                            imm.hideSoftInputFromWindow(autoCompleteTextView.windowToken, 0)
 
-                            exerciseBinding.exerciseNameEditText.setText(editedExercise.name)
-                            exerciseBinding.exerciseGroupEditText.setText(editedExercise.group)
-
-                            if (exerciseBinding.setRecycler.visibility == View.VISIBLE) {
-
-                                setAdapter.setSetList(editedExercise.sets)
-                                exerciseBinding.setRecycler.smoothScrollToPosition(setAdapter.itemCount - 1)
-                            }
-                            exerciseBinding.exerciseGroup.visibility = View.VISIBLE
+                            callback.invoke(ViewEvent.SaveExerciseWithActualWeight(exercise, newName!!, newGroup!!, workoutId))
+//                            callback.invoke(ViewEvent.SaveSet(editedExercise.sets[0]))
+//                            callback.invoke(ViewEvent.SaveExercise(editedExercise))
+//
+//                            exerciseBinding.exerciseNameEditText.setText(editedExercise.name)
+//                            exerciseBinding.exerciseGroupEditText.setText(editedExercise.group)
+//
+//                            if (exerciseBinding.setRecycler.visibility == View.VISIBLE) {
+//
+//                                setAdapter.setSetList(editedExercise.sets)
+//                                exerciseBinding.setRecycler.smoothScrollToPosition(setAdapter.itemCount - 1)
+//                            }
+//                            exerciseBinding.exerciseGroup.visibility = View.VISIBLE
                         }
                     }
                 }
@@ -344,28 +353,28 @@ class ExerciseAdapter(
         return resultList
     }
 
-    private fun updateExercise(
-        exerciseForUpdate: Exercise, newName: String?, newGroup: String?,
-        maxMass: Double
-    ): Exercise {
-        val setsList = exerciseForUpdate.sets
-        val newSetsList = mutableListOf<Set>()
-
-        setsList.forEach { set ->
-            if (setsList.indexOf(set) == 0) {
-                val editedSet = set.copy(mass = maxMass)
-                newSetsList.add(0, editedSet)
-            } else {
-                newSetsList.add(set)
-            }
-        }
-
-        return exerciseForUpdate.copy(
-            name = newName,
-            group = newGroup,
-            sets = newSetsList
-        )
-    }
+//    private fun updateExercise(
+//        exerciseForUpdate: Exercise, newName: String?, newGroup: String?,
+//        maxMass: Double
+//    ): Exercise {
+//        val setsList = exerciseForUpdate.sets
+//        val newSetsList = mutableListOf<Set>()
+//
+//        setsList.forEach { set ->
+//            if (setsList.indexOf(set) == 0) {
+//                val editedSet = set.copy(mass = maxMass)
+//                newSetsList.add(0, editedSet)
+//            } else {
+//                newSetsList.add(set)
+//            }
+//        }
+//
+//        return exerciseForUpdate.copy(
+//            name = newName,
+//            group = newGroup,
+//            sets = newSetsList
+//        )
+//    }
 }
 
 object HolderTypeConstants {

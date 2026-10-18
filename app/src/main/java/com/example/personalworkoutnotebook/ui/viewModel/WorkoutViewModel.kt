@@ -173,7 +173,7 @@ class WorkoutViewModel @Inject constructor(
 
     suspend fun getUniqueExercises() {
         val exercises = loadAllExercises()
-        val uniqueExercises = WorkoutDataService().getUniqueExercisesWithMaxMass(exercises)
+        val uniqueExercises = WorkoutDataService.getUniqueExercisesWithMaxMass(exercises)
         _uniqueExercises.value = uniqueExercises
     }
 
@@ -232,6 +232,24 @@ class WorkoutViewModel @Inject constructor(
         return exerciseRepository.save(exercise).id
     }
 
+    suspend fun saveExerciseWithActualWeight(exercise: Exercise, newName: String, newGroup: String, workoutId : Long){
+
+        val foundedActualWeight = WorkoutDataService.getActualMaxMassForExercise(exerciseRepository.getAllByNameAndGroup(
+            newName, newGroup))
+        exercise.sets.mapIndexed { index, set ->
+            if (index == 0){
+                val updatedSet = set.copy(mass = foundedActualWeight)
+                setRepository.save(updatedSet)
+            } else set
+
+        }
+        val updatedExercise = exercise.copy(name = newName, group = newGroup)
+        exerciseRepository.save(updatedExercise)
+        if (workoutId != 0L) updateWorkoutValue(workoutId)
+        val editedWorkout = workoutRepository.getById(workoutId)
+        println(editedWorkout.toString())
+    }
+
     suspend fun renameExercises(exerciseId: Long, incomingTitle: String, incomingGroup: String){
         val oldExercise = exerciseRepository.getById(exerciseId) ?: return
         val allExercisesList = exerciseRepository.getAll()
@@ -257,7 +275,7 @@ class WorkoutViewModel @Inject constructor(
     suspend fun updateActualWeightInViewModel(exerciseId: Long){
         val exercise = exerciseRepository.getById(exerciseId) ?: return
         var result = -1000.0
-        val incomingMaxValue = WorkoutDataService().getActualMaxMassForExercise(exerciseRepository.getAllByNameAndGroup(
+        val incomingMaxValue = WorkoutDataService.getActualMaxMassForExercise(exerciseRepository.getAllByNameAndGroup(
             exercise.name, exercise.group))
         if (incomingMaxValue > result) {
             result = incomingMaxValue
@@ -308,7 +326,7 @@ class WorkoutViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.HONEYCOMB)
     suspend fun copyWorkoutToBuffer(workoutId: Long, context: Context) {
         val findWorkout = workoutRepository.getById(workoutId) ?: return
-        val outputString = WorkoutDataService().workoutAsString(findWorkout)
+        val outputString = WorkoutDataService.workoutAsString(findWorkout)
 
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Workout", outputString)
@@ -318,7 +336,7 @@ class WorkoutViewModel @Inject constructor(
 
     suspend fun loadAllExercisesGroup(groupOtherName: String) {
         val exercises = exerciseRepository.getAll()
-        _groups.value = WorkoutDataService().getGroupList(groupOtherName, exercises)
+        _groups.value = WorkoutDataService.getGroupList(groupOtherName, exercises)
     }
 
 }

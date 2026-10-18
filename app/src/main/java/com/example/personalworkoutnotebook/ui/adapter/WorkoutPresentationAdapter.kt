@@ -60,7 +60,6 @@ class WorkoutPresentationAdapter(
             val index = workoutList.indexOf(workout)
             itemBinding.root.tag = index
 
-
             if(workout.status == Workout.FINISHED){
                 itemBinding.picture.setImageResource(R.drawable.icon_done)
             }
