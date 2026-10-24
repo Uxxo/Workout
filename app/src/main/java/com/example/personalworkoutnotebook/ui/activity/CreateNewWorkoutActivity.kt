@@ -282,6 +282,7 @@ class CreateNewWorkoutActivity : AppCompatActivity() {
             binding.startNewExercise.setOnClickListener {
                 lifecycleScope.launch {
                     workoutViewModel.addNewExerciseToWorkout(workout.id)
+                    binding.exerciseRecycler.scrollToPosition(workout.exercises.size)
                 }
             }
         }
