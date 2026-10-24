@@ -199,14 +199,14 @@ class WorkoutViewModel @Inject constructor(
     }
 
     suspend fun deleteExercise(exerciseId: Long) {
-        _isLoading.postValue(true)
+//        _isLoading.postValue(true)
 
         val exerciseForDelete = exerciseRepository.getById(exerciseId) ?: return
         exerciseRepository.delete(exerciseForDelete)
 
         updateWorkoutValue(exerciseForDelete.workoutId)
 
-        _isLoading.postValue(false)
+//        _isLoading.postValue(false)
     }
 
     suspend fun getExerciseWithDateByNameAndGroup(exerciseName: String?, exerciseGroup: String?){

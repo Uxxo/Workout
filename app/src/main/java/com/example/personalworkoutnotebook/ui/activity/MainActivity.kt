@@ -62,6 +62,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.menuButtonsLayout.myWorkouts.drawable.setTint(Color.BLUE)
+        //        Enter to the hidden menu (database control)
+        binding.menuButtonsLayout.myWorkouts.setOnLongClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+            true
+        }
+
         binding.menuButtonsLayout.myExercises.setOnClickListener {
             startActivity(Intent(this, ExercisesActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY))
@@ -71,12 +77,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, BioParametersActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY))
         }
-
-//        Enter to the hidden menu (database control)
-        binding.menuButtonsLayout.myWorkouts.setOnClickListener {
-           startActivity(Intent(this, SettingsActivity::class.java))
-        }
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
